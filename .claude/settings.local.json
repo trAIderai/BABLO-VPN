@@ -14,7 +14,13 @@
       "Bash(ssh -o StrictHostKeyChecking=no root@91.184.250.14 \"find /root -name ''docker-compose.yml'' 2>/dev/null || find / -name ''docker-compose.yml'' 2>/dev/null | head -5\")",
       "Bash(ssh -o StrictHostKeyChecking=no root@91.184.250.14 \"ls -la /root/ && docker ps 2>/dev/null || echo ''Docker not running''\")",
       "Bash(mkdir:*)",
-      "Bash(ssh -o StrictHostKeyChecking=no root@91.184.250.14 \"curl -sSL https://raw.githubusercontent.com/trAIderai/BABLO-VPN/main/install.sh | bash\")"
+      "Bash(ssh -o StrictHostKeyChecking=no root@91.184.250.14 \"curl -sSL https://raw.githubusercontent.com/trAIderai/BABLO-VPN/main/install.sh | bash\")",
+      "Bash(cat:*)",
+      "Bash(findstr:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@91.184.250.14 \"free -h && df -h && docker ps -a 2>/dev/null || echo ''Docker check failed''\")",
+      "Bash(ssh:*)",
+      "Bash(docker run:*)"
     ]
   }
 }
