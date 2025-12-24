@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import {
   Shield,
   Plus,
@@ -53,6 +54,13 @@ export default function HomePage() {
   const [adding, setAdding] = useState(false);
   const [qrModal, setQrModal] = useState<{ client: Client; qr: string } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showSplash, setShowSplash] = useState(true);
+
+  // Hide splash after 10 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 10000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Check session
   useEffect(() => {
@@ -209,6 +217,79 @@ export default function HomePage() {
     return now - lastHandshake < 3 * 60 * 1000; // 3 minutes
   };
 
+  // Splash Screen
+  if (showSplash) {
+    return (
+      <div
+        className="splash-container"
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "#08090B",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 100,
+        }}
+      >
+        {/* Background glow */}
+        <div
+          style={{
+            position: "absolute",
+            width: "600px",
+            height: "600px",
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(240, 185, 11, 0.15) 0%, transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+
+        {/* Logo */}
+        <div className="splash-logo" style={{ position: "relative", width: "320px", height: "320px" }}>
+          <Image
+            src="/splash-bg.png"
+            alt="BABLO"
+            fill
+            style={{ objectFit: "contain" }}
+            priority
+          />
+        </div>
+
+        {/* Text */}
+        <div className="splash-text" style={{ marginTop: "32px", textAlign: "center", opacity: 0 }}>
+          <h1
+            className="font-bablo"
+            style={{
+              fontSize: "3.5rem",
+              color: "#F0B90B",
+              letterSpacing: "0.1em",
+              textShadow: "0 0 40px rgba(240, 185, 11, 0.5)",
+              margin: 0,
+            }}
+          >
+            BABLO VPN
+          </h1>
+          <p style={{ color: "#6B7280", marginTop: "8px", fontSize: "14px", letterSpacing: "0.2em" }}>
+            WIREGUARD MANAGEMENT
+          </p>
+        </div>
+
+        {/* Shimmer line */}
+        <div
+          className="splash-shimmer"
+          style={{
+            position: "absolute",
+            bottom: "100px",
+            width: "200px",
+            height: "2px",
+            borderRadius: "2px",
+          }}
+        />
+      </div>
+    );
+  }
+
   // Login screen
   if (!session?.authenticated) {
     return (
@@ -227,7 +308,7 @@ export default function HomePage() {
             }}>
               <Shield style={{ width: "32px", height: "32px", color: "#F0B90B" }} />
             </div>
-            <h1 style={{ fontSize: "24px", fontWeight: 600, margin: 0 }}>BABLO VPN</h1>
+            <h1 className="font-bablo" style={{ fontSize: "28px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
             <p style={{ color: "#6B7280", marginTop: "8px" }}>WireGuard Management</p>
           </div>
 
@@ -287,7 +368,7 @@ export default function HomePage() {
               <Shield style={{ width: "24px", height: "24px", color: "#F0B90B" }} />
             </div>
             <div>
-              <h1 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>BABLO VPN</h1>
+              <h1 className="font-bablo" style={{ fontSize: "22px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
               <p style={{ color: "#6B7280", fontSize: "14px", margin: 0 }}>WireGuard Clients</p>
             </div>
           </div>
