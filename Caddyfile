@@ -1,0 +1,3 @@
+vpn.bablo.bot {
+    reverse_proxy wg-easy:51821
+}
