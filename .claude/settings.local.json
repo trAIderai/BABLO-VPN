@@ -20,7 +20,9 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 root@91.184.250.14 \"free -h && df -h && docker ps -a 2>/dev/null || echo ''Docker check failed''\")",
       "Bash(ssh:*)",
-      "Bash(docker run:*)"
+      "Bash(docker run:*)",
+      "WebFetch(domain:vpn.bablo.bot)",
+      "Bash(copy \"C:\\\\Trading\\\\AI Trading\\\\trAIder\\\\frontend\\\\public\\\\login-bg.png\" \"C:\\\\Trading\\\\AI Trading\\\\Bablo.vpn\\\\frontend\\\\public\\\\splash-bg.png\")"
     ]
   }
 }
