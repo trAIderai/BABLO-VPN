@@ -231,46 +231,44 @@ export default function HomePage() {
           alignItems: "center",
           justifyContent: "center",
           zIndex: 100,
+          overflow: "hidden",
         }}
       >
-        {/* Background glow */}
-        <div
-          style={{
-            position: "absolute",
-            width: "600px",
-            height: "600px",
-            borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(240, 185, 11, 0.15) 0%, transparent 70%)",
-            filter: "blur(60px)",
-          }}
-        />
-
-        {/* Logo */}
-        <div className="splash-logo" style={{ position: "relative", width: "320px", height: "320px" }}>
+        {/* Full screen background logo */}
+        <div className="splash-logo" style={{ position: "absolute", inset: 0 }}>
           <Image
             src="/splash-bg.png"
             alt="BABLO"
             fill
-            style={{ objectFit: "contain" }}
+            style={{ objectFit: "cover" }}
             priority
           />
         </div>
 
+        {/* Dark overlay for text readability */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "radial-gradient(circle at center, transparent 30%, rgba(8, 9, 11, 0.7) 70%)",
+          }}
+        />
+
         {/* Text */}
-        <div className="splash-text" style={{ marginTop: "32px", textAlign: "center", opacity: 0 }}>
+        <div className="splash-text" style={{ position: "relative", zIndex: 10, textAlign: "center", marginTop: "60vh", opacity: 0 }}>
           <h1
             className="font-bablo"
             style={{
-              fontSize: "3.5rem",
+              fontSize: "4rem",
               color: "#F0B90B",
-              letterSpacing: "0.1em",
-              textShadow: "0 0 40px rgba(240, 185, 11, 0.5)",
+              letterSpacing: "0.15em",
+              textShadow: "0 0 60px rgba(240, 185, 11, 0.6)",
               margin: 0,
             }}
           >
             BABLO VPN
           </h1>
-          <p style={{ color: "#6B7280", marginTop: "8px", fontSize: "14px", letterSpacing: "0.2em" }}>
+          <p style={{ color: "#6B7280", marginTop: "12px", fontSize: "14px", letterSpacing: "0.3em" }}>
             WIREGUARD MANAGEMENT
           </p>
         </div>
@@ -280,10 +278,11 @@ export default function HomePage() {
           className="splash-shimmer"
           style={{
             position: "absolute",
-            bottom: "100px",
+            bottom: "80px",
             width: "200px",
             height: "2px",
             borderRadius: "2px",
+            zIndex: 10,
           }}
         />
       </div>
@@ -351,8 +350,27 @@ export default function HomePage() {
 
   // Main dashboard
   return (
-    <div style={{ minHeight: "100vh", padding: "24px" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", padding: "24px", position: "relative", overflow: "hidden" }}>
+      {/* Background logo */}
+      <div style={{
+        position: "fixed",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "80vw",
+        height: "80vh",
+        opacity: 0.03,
+        pointerEvents: "none",
+        zIndex: 0,
+      }}>
+        <Image
+          src="/splash-bg.png"
+          alt=""
+          fill
+          style={{ objectFit: "contain" }}
+        />
+      </div>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
