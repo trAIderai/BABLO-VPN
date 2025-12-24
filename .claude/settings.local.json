@@ -7,7 +7,13 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(ssh root@91.184.250.14 \"cat /root/bablo-vpn/docker-compose.yml\")",
+      "Bash(ssh -o StrictHostKeyChecking=no root@91.184.250.14 \"find /root -name ''docker-compose.yml'' 2>/dev/null || find / -name ''docker-compose.yml'' 2>/dev/null | head -5\")",
+      "Bash(ssh -o StrictHostKeyChecking=no root@91.184.250.14 \"ls -la /root/ && docker ps 2>/dev/null || echo ''Docker not running''\")",
+      "Bash(mkdir:*)"
     ]
   }
 }

@@ -1,19 +1,19 @@
 #!/bin/bash
-# BABLO VPN - Установочный скрипт
+# BABLO VPN - Установочный скрипт с кастомным UI
 # Для Ubuntu 22.04
 
 set -e
 
 echo "=========================================="
-echo "   BABLO VPN - Установка wg-easy"
+echo "   BABLO VPN - Установка"
 echo "=========================================="
 
 # Обновление системы
-echo "[1/5] Обновление системы..."
+echo "[1/6] Обновление системы..."
 apt update && apt upgrade -y
 
 # Установка Docker
-echo "[2/5] Установка Docker..."
+echo "[2/6] Установка Docker..."
 if ! command -v docker &> /dev/null; then
     curl -fsSL https://get.docker.com | sh
     systemctl enable docker
@@ -23,71 +23,25 @@ else
 fi
 
 # Установка Docker Compose плагина
-echo "[3/5] Проверка Docker Compose..."
+echo "[3/6] Проверка Docker Compose..."
 docker compose version || apt install -y docker-compose-plugin
 
-# Создание директории проекта
-echo "[4/5] Создание проекта..."
-mkdir -p /opt/bablo-vpn
-cd /opt/bablo-vpn
+# Установка Git
+echo "[4/6] Проверка Git..."
+apt install -y git
 
-# Создание docker-compose.yml
-cat > docker-compose.yml << 'EOF'
-services:
-  wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:15
-    container_name: wg-easy
-    environment:
-      - LANG=ru
-      - WG_HOST=bablo.bot
-      - PASSWORD=Superb2016@
-      - WG_PORT=51820
-      - WG_DEFAULT_DNS=1.1.1.1, 8.8.8.8
-      - WG_ALLOWED_IPS=0.0.0.0/0, ::/0
-      - WG_DEFAULT_ADDRESS=10.8.0.x
-      - PORT=51821
-    volumes:
-      - wg-easy-data:/etc/wireguard
-    ports:
-      - "51820:51820/udp"
-      - "51821:51821/tcp"
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv4.ip_forward=1
-    restart: unless-stopped
-
-  caddy:
-    image: caddy:2-alpine
-    container_name: caddy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-    restart: unless-stopped
-    depends_on:
-      - wg-easy
-
-volumes:
-  wg-easy-data:
-  caddy-data:
-  caddy-config:
-EOF
-
-# Создание Caddyfile для HTTPS
-cat > Caddyfile << 'EOF'
-bablo.bot {
-    reverse_proxy wg-easy:51821
-}
-EOF
+# Клонирование или обновление репозитория
+echo "[5/6] Загрузка проекта..."
+if [ -d "/opt/bablo-vpn" ]; then
+    cd /opt/bablo-vpn
+    git pull origin main || true
+else
+    git clone https://github.com/trAIderai/BABLO-VPN.git /opt/bablo-vpn
+    cd /opt/bablo-vpn
+fi
 
 # Открытие портов в firewall (если UFW активен)
-echo "[5/5] Настройка firewall..."
+echo "[6/6] Настройка firewall..."
 if command -v ufw &> /dev/null; then
     ufw allow 22/tcp
     ufw allow 80/tcp
@@ -96,14 +50,22 @@ if command -v ufw &> /dev/null; then
     echo "y" | ufw enable || true
 fi
 
-# Запуск контейнеров
+# Остановка старых контейнеров
 echo "=========================================="
-echo "   Запуск BABLO VPN..."
+echo "   Остановка старых контейнеров..."
 echo "=========================================="
+docker stop wg-easy caddy vpn-ui 2>/dev/null || true
+docker rm wg-easy caddy vpn-ui 2>/dev/null || true
+
+# Сборка и запуск контейнеров
+echo "=========================================="
+echo "   Сборка и запуск BABLO VPN..."
+echo "=========================================="
+docker compose build --no-cache
 docker compose up -d
 
 # Ожидание запуска
-sleep 5
+sleep 10
 
 # Статус
 echo ""
@@ -111,11 +73,13 @@ echo "=========================================="
 echo "   УСТАНОВКА ЗАВЕРШЕНА!"
 echo "=========================================="
 echo ""
-echo "Админ-панель: https://bablo.bot"
+docker compose ps
+echo ""
+echo "Админ-панель: https://vpn.bablo.bot"
 echo "Пароль: Superb2016@"
 echo ""
 echo "WireGuard порт: 51820/udp"
 echo ""
-echo "Проверка статуса: docker compose ps"
-echo "Логи: docker compose logs -f"
+echo "Проверка статуса: cd /opt/bablo-vpn && docker compose ps"
+echo "Логи: cd /opt/bablo-vpn && docker compose logs -f"
 echo "=========================================="
