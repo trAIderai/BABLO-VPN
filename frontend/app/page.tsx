@@ -585,6 +585,29 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Footer */}
+      <div style={{
+        position: "fixed",
+        bottom: "16px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        fontSize: "12px",
+        color: "#4B5563",
+        zIndex: 1,
+      }}>
+        Powered by{" "}
+        <a
+          href="https://github.com/wg-easy/wg-easy"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#6B7280", textDecoration: "none" }}
+          onMouseOver={(e) => (e.currentTarget.style.color = "#F0B90B")}
+          onMouseOut={(e) => (e.currentTarget.style.color = "#6B7280")}
+        >
+          wg-easy
+        </a>
+      </div>
+
       {/* QR Modal */}
       {qrModal && (
         <div style={{
