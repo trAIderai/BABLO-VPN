@@ -357,9 +357,9 @@ export default function HomePage() {
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        width: "80vw",
-        height: "80vh",
-        opacity: 0.03,
+        width: "120vw",
+        height: "120vh",
+        opacity: 0.10,
         pointerEvents: "none",
         zIndex: 0,
       }}>
