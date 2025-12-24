@@ -1,3 +1,11 @@
 vpn.bablo.bot {
-    reverse_proxy wg-easy:51821
+    # API requests go to wg-easy
+    handle /api/* {
+        reverse_proxy wg-easy:51821
+    }
+
+    # Everything else goes to our custom UI
+    handle {
+        reverse_proxy vpn-ui:3000
+    }
 }

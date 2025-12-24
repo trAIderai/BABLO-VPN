@@ -1,6 +1,6 @@
 services:
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:15
+    image: ghcr.io/wg-easy/wg-easy:14
     container_name: wg-easy
     environment:
       # Язык интерфейса
@@ -19,13 +19,14 @@ services:
       - WG_DEFAULT_ADDRESS=10.8.0.x
       # UI на порту 51821
       - PORT=51821
+      # Статистика и графики
+      - UI_TRAFFIC_STATS=true
+      - UI_CHART_TYPE=2
     volumes:
       - wg-easy-data:/etc/wireguard
     ports:
       # WireGuard UDP порт
       - "51820:51820/udp"
-      # Web UI порт
-      - "51821:51821/tcp"
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -33,6 +34,15 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
       - net.ipv4.ip_forward=1
     restart: unless-stopped
+
+  vpn-ui:
+    build: ./frontend
+    container_name: vpn-ui
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on:
+      - wg-easy
 
   caddy:
     image: caddy:2-alpine
@@ -47,6 +57,7 @@ services:
     restart: unless-stopped
     depends_on:
       - wg-easy
+      - vpn-ui
 
 volumes:
   wg-easy-data:
