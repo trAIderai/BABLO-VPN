@@ -1,0 +1,22 @@
+# Environment files with secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+.next/
+.cache/
+
+# Docker volumes
+wg-easy-data/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
