@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import {
   Shield,
@@ -24,6 +24,19 @@ import {
   Pause,
 } from "lucide-react";
 import QRCode from "qrcode";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (container: string | HTMLElement, options: {
+        sitekey: string;
+        callback: (token: string) => void;
+        theme?: string;
+      }) => string;
+      reset: (widgetId: string) => void;
+    };
+  }
+}
 
 interface Client {
   id: string;
@@ -74,11 +87,68 @@ export default function HomePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [togglingAll, setTogglingAll] = useState(false);
+  
+  // Turnstile state
+  const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+  const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 10000);
     return () => clearTimeout(timer);
   }, []);
+
+  // Load Turnstile config and script
+  useEffect(() => {
+    const loadTurnstile = async () => {
+      try {
+        const res = await fetch("/api/config");
+        const config = await res.json();
+        if (config.turnstileSiteKey) {
+          setTurnstileSiteKey(config.turnstileSiteKey);
+          // Load Turnstile script
+          if (\!document.getElementById("turnstile-script")) {
+            const script = document.createElement("script");
+            script.id = "turnstile-script";
+            script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+            script.async = true;
+            document.head.appendChild(script);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load config:", e);
+      }
+    };
+    loadTurnstile();
+  }, []);
+
+  // Render Turnstile widget when ready
+  useEffect(() => {
+    if (\!turnstileSiteKey || \!turnstileContainerRef.current || session?.authenticated) return;
+    
+    const renderWidget = () => {
+      if (window.turnstile && turnstileContainerRef.current && \!turnstileWidgetId.current) {
+        turnstileWidgetId.current = window.turnstile.render(turnstileContainerRef.current, {
+          sitekey: turnstileSiteKey,
+          callback: (token: string) => setTurnstileToken(token),
+          theme: "dark",
+        });
+      }
+    };
+
+    if (window.turnstile) {
+      renderWidget();
+    } else {
+      const interval = setInterval(() => {
+        if (window.turnstile) {
+          renderWidget();
+          clearInterval(interval);
+        }
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [turnstileSiteKey, session]);
 
   useEffect(() => {
     checkSession();
@@ -103,19 +173,30 @@ export default function HomePage() {
   const login = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    
+    if (turnstileSiteKey && \!turnstileToken) {
+      setError("Please complete the CAPTCHA");
+      return;
+    }
+    
     setLoading(true);
     try {
-      const res = await fetch("/api/session", {
+      const res = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, turnstileToken }),
       });
       if (res.ok) {
         setSession({ authenticated: true, requiresPassword: true });
         loadClients();
       } else {
-        setError("Wrong password");
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Wrong password");
         setLoading(false);
+        if (window.turnstile && turnstileWidgetId.current) {
+          window.turnstile.reset(turnstileWidgetId.current);
+          setTurnstileToken(null);
+        }
       }
     } catch (e) {
       setError("Login failed");
@@ -166,9 +247,9 @@ export default function HomePage() {
   };
 
   const deleteClient = async (client: Client) => {
-    if (!confirm(`Delete "${client.name}"?`)) return;
+    if (!confirm("Delete "" + client.name + ""?")) return;
     try {
-      await fetch(`/api/wireguard/client/${client.id}`, { method: "DELETE" });
+      await fetch("/api/wireguard/client/" + client.id, { method: "DELETE" });
       loadClients();
     } catch (e) {
       console.error("Failed to delete client:", e);
@@ -177,7 +258,7 @@ export default function HomePage() {
 
   const toggleClient = async (client: Client) => {
     try {
-      await fetch(`/api/wireguard/client/${client.id}/${client.enabled ? "disable" : "enable"}`, {
+      await fetch("/api/wireguard/client/" + client.id + "/" + (client.enabled ? "disable" : "enable"), {
         method: "POST",
       });
       loadClients();
@@ -189,14 +270,12 @@ export default function HomePage() {
   const toggleAllClients = async () => {
     const enabledClients = clients.filter(c => c.enabled);
     const allEnabled = enabledClients.length === clients.length;
-    const action = allEnabled ? "disable" : "enable";
 
     setTogglingAll(true);
     try {
-      // Toggle all clients in parallel
       await Promise.all(
         clients.map(client =>
-          fetch(`/api/wireguard/client/${client.id}/${allEnabled ? "disable" : "enable"}`, {
+          fetch("/api/wireguard/client/" + client.id + "/" + (allEnabled ? "disable" : "enable"), {
             method: "POST",
           })
         )
@@ -211,13 +290,13 @@ export default function HomePage() {
 
   const downloadConfig = async (client: Client) => {
     try {
-      const res = await fetch(`/api/wireguard/client/${client.id}/configuration`);
+      const res = await fetch("/api/wireguard/client/" + client.id + "/configuration");
       const config = await res.text();
       const blob = new Blob([config], { type: "text/plain" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${client.name}.conf`;
+      a.download = client.name + ".conf";
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -227,7 +306,7 @@ export default function HomePage() {
 
   const showQR = async (client: Client) => {
     try {
-      const res = await fetch(`/api/wireguard/client/${client.id}/configuration`);
+      const res = await fetch("/api/wireguard/client/" + client.id + "/configuration");
       const config = await res.text();
       const qr = await QRCode.toDataURL(config, { width: 300, margin: 2 });
       setQrModal({ client, qr });
@@ -238,7 +317,7 @@ export default function HomePage() {
 
   const copyConfig = async (client: Client) => {
     try {
-      const res = await fetch(`/api/wireguard/client/${client.id}/configuration`);
+      const res = await fetch("/api/wireguard/client/" + client.id + "/configuration");
       const config = await res.text();
       await navigator.clipboard.writeText(config);
       setCopiedId(client.id);
@@ -292,8 +371,11 @@ export default function HomePage() {
           </div>
           <form onSubmit={login}>
             <input type="password" className="input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
-            {error && <p style={{ color: "#EF4444", fontSize: "14px", marginTop: "12px" }}>{error}</p>}
-            <button type="submit" className="btn-gold" style={{ width: "100%", marginTop: "16px" }} disabled={loading}>
+            {turnstileSiteKey && (
+              <div ref={turnstileContainerRef} style={{ marginTop: "16px", display: "flex", justifyContent: "center" }} />
+            )}
+            {error && <p style={{ color: "#EF4444", fontSize: "14px", marginTop: "12px", textAlign: "center" }}>{error}</p>}
+            <button type="submit" className="btn-gold" style={{ width: "100%", marginTop: "16px" }} disabled={loading || (turnstileSiteKey ? !turnstileToken : false)}>
               {loading ? <Loader2 className="animate-spin" style={{ width: "20px", height: "20px" }} /> : "Login"}
             </button>
           </form>
@@ -320,7 +402,7 @@ export default function HomePage() {
 
   return (
     <div className="main-container" style={{ minHeight: "100vh", padding: "24px", position: "relative", overflow: "hidden" }}>
-      {/* Background logo - bigger size */}
+      {/* Background logo */}
       <div className="bg-logo" style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "180vw", height: "180vh", opacity: 0.12, pointerEvents: "none", zIndex: 0 }}>
         <Image src="/splash-bg.png" alt="" fill style={{ objectFit: "contain" }} />
       </div>
@@ -336,7 +418,6 @@ export default function HomePage() {
             </div>
           </div>
           <div className="header-actions" style={{ display: "flex", gap: "12px" }}>
-            {/* Toggle All Button */}
             {clients.length > 0 && (
               <button
                 onClick={toggleAllClients}
@@ -361,17 +442,8 @@ export default function HomePage() {
                 )}
               </button>
             )}
-            {/* Refresh Button */}
-            <button
-              onClick={handleRefresh}
-              className="btn-secondary"
-              style={{ padding: "10px 16px" }}
-              disabled={refreshing}
-            >
-              <RefreshCw
-                style={{ width: "18px", height: "18px" }}
-                className={refreshing ? "animate-spin" : ""}
-              />
+            <button onClick={handleRefresh} className="btn-secondary" style={{ padding: "10px 16px" }} disabled={refreshing}>
+              <RefreshCw style={{ width: "18px", height: "18px" }} className={refreshing ? "animate-spin" : ""} />
             </button>
             <button onClick={() => setShowAddModal(true)} className="btn-gold" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Plus style={{ width: "18px", height: "18px" }} />
@@ -380,7 +452,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Stats Grid with classes for mobile */}
+        {/* Stats Grid */}
         <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
           <div className="card" style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
