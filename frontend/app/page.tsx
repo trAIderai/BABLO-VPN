@@ -108,7 +108,7 @@ export default function HomePage() {
         if (config.turnstileSiteKey) {
           setTurnstileSiteKey(config.turnstileSiteKey);
           // Load Turnstile script
-          if (\!document.getElementById("turnstile-script")) {
+          if (!document.getElementById("turnstile-script")) {
             const script = document.createElement("script");
             script.id = "turnstile-script";
             script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
@@ -125,10 +125,10 @@ export default function HomePage() {
 
   // Render Turnstile widget when ready
   useEffect(() => {
-    if (\!turnstileSiteKey || \!turnstileContainerRef.current || session?.authenticated) return;
+    if (!turnstileSiteKey || !turnstileContainerRef.current || session?.authenticated) return;
     
     const renderWidget = () => {
-      if (window.turnstile && turnstileContainerRef.current && \!turnstileWidgetId.current) {
+      if (window.turnstile && turnstileContainerRef.current && !turnstileWidgetId.current) {
         turnstileWidgetId.current = window.turnstile.render(turnstileContainerRef.current, {
           sitekey: turnstileSiteKey,
           callback: (token: string) => setTurnstileToken(token),
@@ -174,7 +174,7 @@ export default function HomePage() {
     e.preventDefault();
     setError("");
     
-    if (turnstileSiteKey && \!turnstileToken) {
+    if (turnstileSiteKey && !turnstileToken) {
       setError("Please complete the CAPTCHA");
       return;
     }
