@@ -13,17 +13,15 @@ vpn.bablo.bot {
         -Server
     }
 
-    # Rate limiting for login endpoint (requires caddy-ratelimit plugin)
-    # Uncomment if you have the plugin installed:
-    # rate_limit {
-    #     zone login {
-    #         key {remote_host}
-    #         events 5
-    #         window 1m
-    #     }
-    # }
+    # Our custom API routes (auth, config) go to vpn-ui
+    handle /api/auth {
+        reverse_proxy vpn-ui:3000
+    }
+    handle /api/config {
+        reverse_proxy vpn-ui:3000
+    }
 
-    # API requests go to wg-easy
+    # WireGuard API requests go to wg-easy
     handle /api/* {
         reverse_proxy wg-easy:51821
     }
