@@ -43,6 +43,21 @@ interface Session {
   requiresPassword: boolean;
 }
 
+// Social Links Component
+const SocialLinks = () => (
+  <div className="social-links">
+    <a href="https://www.youtube.com/@EverydayTraderX" target="_blank" rel="noopener noreferrer" className="social-link" title="YouTube">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    </a>
+    <a href="https://t.me/EverydayTraderX" target="_blank" rel="noopener noreferrer" className="social-link" title="Telegram Channel">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+    </a>
+    <a href="https://t.me/everydaytradertalks" target="_blank" rel="noopener noreferrer" className="social-link" title="Telegram Chat">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+    </a>
+  </div>
+);
+
 export default function HomePage() {
   const [session, setSession] = useState<Session | null>(null);
   const [password, setPassword] = useState("");
@@ -56,13 +71,11 @@ export default function HomePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
 
-  // Hide splash after 10 seconds
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 10000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Check session
   useEffect(() => {
     checkSession();
   }, []);
@@ -214,130 +227,52 @@ export default function HomePage() {
     if (!client.latestHandshakeAt) return false;
     const lastHandshake = new Date(client.latestHandshakeAt).getTime();
     const now = Date.now();
-    return now - lastHandshake < 3 * 60 * 1000; // 3 minutes
+    return now - lastHandshake < 3 * 60 * 1000;
   };
 
-  // Splash Screen
   if (showSplash) {
     return (
-      <div
-        className="splash-container"
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "#08090B",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 100,
-          overflow: "hidden",
-        }}
-      >
-        {/* Full screen background logo */}
+      <div className="splash-container" style={{ position: "fixed", inset: 0, background: "#08090B", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 100, overflow: "hidden" }}>
         <div className="splash-logo" style={{ position: "absolute", inset: 0 }}>
-          <Image
-            src="/splash-bg.png"
-            alt="BABLO"
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-          />
+          <Image src="/splash-bg.png" alt="BABLO" fill style={{ objectFit: "cover" }} priority />
         </div>
-
-        {/* Dark overlay for text readability */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "radial-gradient(circle at center, transparent 30%, rgba(8, 9, 11, 0.7) 70%)",
-          }}
-        />
-
-        {/* Text */}
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at center, transparent 30%, rgba(8, 9, 11, 0.7) 70%)" }} />
         <div className="splash-text" style={{ position: "relative", zIndex: 10, textAlign: "center", marginTop: "60vh", opacity: 0 }}>
-          <h1
-            className="font-bablo"
-            style={{
-              fontSize: "4rem",
-              color: "#F0B90B",
-              letterSpacing: "0.15em",
-              textShadow: "0 0 60px rgba(240, 185, 11, 0.6)",
-              margin: 0,
-            }}
-          >
-            BABLO VPN
-          </h1>
-          <p style={{ color: "#6B7280", marginTop: "12px", fontSize: "14px", letterSpacing: "0.3em" }}>
-            WIREGUARD MANAGEMENT
-          </p>
+          <h1 className="font-bablo splash-title" style={{ fontSize: "4rem", color: "#F0B90B", letterSpacing: "0.15em", textShadow: "0 0 60px rgba(240, 185, 11, 0.6)", margin: 0 }}>BABLO VPN</h1>
+          <p style={{ color: "#6B7280", marginTop: "12px", fontSize: "14px", letterSpacing: "0.3em" }}>WIREGUARD MANAGEMENT</p>
         </div>
-
-        {/* Shimmer line */}
-        <div
-          className="splash-shimmer"
-          style={{
-            position: "absolute",
-            bottom: "80px",
-            width: "200px",
-            height: "2px",
-            borderRadius: "2px",
-            zIndex: 10,
-          }}
-        />
+        <div className="splash-shimmer" style={{ position: "absolute", bottom: "80px", width: "200px", height: "2px", borderRadius: "2px", zIndex: 10 }} />
       </div>
     );
   }
 
-  // Login screen
   if (!session?.authenticated) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div className="card animate-fadeIn" style={{ padding: "40px", width: "100%", maxWidth: "400px" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+        <div className="card animate-fadeIn login-card" style={{ padding: "40px", width: "100%", maxWidth: "400px" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
-            <div style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 16px"
-            }}>
+            <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
               <Shield style={{ width: "32px", height: "32px", color: "#F0B90B" }} />
             </div>
             <h1 className="font-bablo" style={{ fontSize: "28px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
             <p style={{ color: "#6B7280", marginTop: "8px" }}>WireGuard Management</p>
           </div>
-
           <form onSubmit={login}>
-            <input
-              type="password"
-              className="input"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoFocus
-            />
-            {error && (
-              <p style={{ color: "#EF4444", fontSize: "14px", marginTop: "12px" }}>{error}</p>
-            )}
-            <button
-              type="submit"
-              className="btn-gold"
-              style={{ width: "100%", marginTop: "16px" }}
-              disabled={loading}
-            >
+            <input type="password" className="input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
+            {error && <p style={{ color: "#EF4444", fontSize: "14px", marginTop: "12px" }}>{error}</p>}
+            <button type="submit" className="btn-gold" style={{ width: "100%", marginTop: "16px" }} disabled={loading}>
               {loading ? <Loader2 className="animate-spin" style={{ width: "20px", height: "20px" }} /> : "Login"}
             </button>
           </form>
+          <div style={{ marginTop: "32px", paddingTop: "24px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+            <p style={{ color: "#6B7280", fontSize: "12px", textAlign: "center", marginBottom: "16px" }}>Follow EverydayTrader</p>
+            <SocialLinks />
+          </div>
         </div>
       </div>
     );
   }
 
-  // Loading
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -348,41 +283,15 @@ export default function HomePage() {
 
   const onlineCount = clients.filter(isOnline).length;
 
-  // Main dashboard
   return (
-    <div style={{ minHeight: "100vh", padding: "24px", position: "relative", overflow: "hidden" }}>
-      {/* Background logo */}
-      <div style={{
-        position: "fixed",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: "120vw",
-        height: "120vh",
-        opacity: 0.10,
-        pointerEvents: "none",
-        zIndex: 0,
-      }}>
-        <Image
-          src="/splash-bg.png"
-          alt=""
-          fill
-          style={{ objectFit: "contain" }}
-        />
+    <div className="main-container" style={{ minHeight: "100vh", padding: "24px", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "120vw", height: "120vh", opacity: 0.10, pointerEvents: "none", zIndex: 0 }}>
+        <Image src="/splash-bg.png" alt="" fill style={{ objectFit: "contain" }} />
       </div>
       <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "12px",
-              background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center"
-            }}>
+        <div className="header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+          <div className="header-left" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+            <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Shield style={{ width: "24px", height: "24px", color: "#F0B90B" }} />
             </div>
             <div>
@@ -390,8 +299,7 @@ export default function HomePage() {
               <p style={{ color: "#6B7280", fontSize: "14px", margin: 0 }}>WireGuard Clients</p>
             </div>
           </div>
-
-          <div style={{ display: "flex", gap: "12px" }}>
+          <div className="header-actions" style={{ display: "flex", gap: "12px" }}>
             <button onClick={loadClients} className="btn-secondary" style={{ padding: "10px 16px" }}>
               <RefreshCw style={{ width: "18px", height: "18px" }} />
             </button>
@@ -402,8 +310,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Stats */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
+        <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
           <div className="card" style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <Users style={{ width: "20px", height: "20px", color: "#F0B90B" }} />
@@ -427,50 +334,27 @@ export default function HomePage() {
               <ArrowDownToLine style={{ width: "20px", height: "20px", color: "#3B82F6" }} />
               <div>
                 <p style={{ color: "#6B7280", fontSize: "12px", margin: 0 }}>Total Traffic</p>
-                <p style={{ fontSize: "24px", fontWeight: 600, margin: 0 }}>
-                  {formatBytes(clients.reduce((sum, c) => sum + c.transferRx + c.transferTx, 0))}
-                </p>
+                <p style={{ fontSize: "24px", fontWeight: 600, margin: 0 }}>{formatBytes(clients.reduce((sum, c) => sum + c.transferRx + c.transferTx, 0))}</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Clients Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "16px" }}>
+        <div className="clients-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "16px" }}>
           {clients.map((client) => (
             <div key={client.id} className="card animate-fadeIn" style={{ padding: "20px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "16px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{
-                    width: "10px",
-                    height: "10px",
-                    borderRadius: "50%",
-                    flexShrink: 0
-                  }} className={isOnline(client) ? "status-online" : "status-offline"} />
+                  <div style={{ width: "10px", height: "10px", borderRadius: "50%", flexShrink: 0 }} className={isOnline(client) ? "status-online" : "status-offline"} />
                   <div>
                     <h3 style={{ fontSize: "16px", fontWeight: 500, margin: 0 }}>{client.name}</h3>
                     <p style={{ color: "#6B7280", fontSize: "12px", margin: "4px 0 0" }}>{client.address}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => toggleClient(client)}
-                  style={{
-                    padding: "6px",
-                    borderRadius: "8px",
-                    border: "none",
-                    background: client.enabled ? "rgba(16, 185, 129, 0.1)" : "rgba(107, 114, 128, 0.1)",
-                    cursor: "pointer"
-                  }}
-                >
-                  <Power style={{
-                    width: "16px",
-                    height: "16px",
-                    color: client.enabled ? "#10B981" : "#6B7280"
-                  }} />
+                <button onClick={() => toggleClient(client)} style={{ padding: "6px", borderRadius: "8px", border: "none", background: client.enabled ? "rgba(16, 185, 129, 0.1)" : "rgba(107, 114, 128, 0.1)", cursor: "pointer" }}>
+                  <Power style={{ width: "16px", height: "16px", color: client.enabled ? "#10B981" : "#6B7280" }} />
                 </button>
               </div>
-
-              {/* Traffic stats */}
               <div style={{ display: "flex", gap: "16px", marginBottom: "16px", fontSize: "13px" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                   <ArrowDownToLine style={{ width: "14px", height: "14px", color: "#10B981" }} />
@@ -481,41 +365,19 @@ export default function HomePage() {
                   <span style={{ color: "#9CA3AF" }}>{formatBytes(client.transferTx)}</span>
                 </div>
               </div>
-
-              {/* Actions */}
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  onClick={() => downloadConfig(client)}
-                  className="btn-secondary"
-                  style={{ flex: 1, padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}
-                >
+              <div className="client-actions" style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => downloadConfig(client)} className="btn-secondary" style={{ flex: 1, padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}>
                   <Download style={{ width: "14px", height: "14px" }} />
                   Config
                 </button>
-                <button
-                  onClick={() => showQR(client)}
-                  className="btn-secondary"
-                  style={{ flex: 1, padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}
-                >
+                <button onClick={() => showQR(client)} className="btn-secondary" style={{ flex: 1, padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}>
                   <QrCode style={{ width: "14px", height: "14px" }} />
                   QR
                 </button>
-                <button
-                  onClick={() => copyConfig(client)}
-                  className="btn-secondary"
-                  style={{ padding: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                >
-                  {copiedId === client.id ? (
-                    <Check style={{ width: "14px", height: "14px", color: "#10B981" }} />
-                  ) : (
-                    <Copy style={{ width: "14px", height: "14px" }} />
-                  )}
+                <button onClick={() => copyConfig(client)} className="btn-secondary" style={{ padding: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {copiedId === client.id ? <Check style={{ width: "14px", height: "14px", color: "#10B981" }} /> : <Copy style={{ width: "14px", height: "14px" }} />}
                 </button>
-                <button
-                  onClick={() => deleteClient(client)}
-                  className="btn-secondary"
-                  style={{ padding: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}
-                >
+                <button onClick={() => deleteClient(client)} className="btn-secondary" style={{ padding: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Trash2 style={{ width: "14px", height: "14px", color: "#EF4444" }} />
                 </button>
               </div>
@@ -527,55 +389,24 @@ export default function HomePage() {
           <div className="card" style={{ padding: "60px", textAlign: "center" }}>
             <Wifi style={{ width: "48px", height: "48px", color: "#6B7280", margin: "0 auto 16px" }} />
             <p style={{ color: "#6B7280", fontSize: "16px" }}>No VPN clients yet</p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="btn-gold"
-              style={{ marginTop: "16px" }}
-            >
-              Add First Client
-            </button>
+            <button onClick={() => setShowAddModal(true)} className="btn-gold" style={{ marginTop: "16px" }}>Add First Client</button>
           </div>
         )}
       </div>
 
-      {/* Add Client Modal */}
       {showAddModal && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0, 0, 0, 0.7)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 50
-        }} onClick={() => setShowAddModal(false)}>
-          <div
-            className="card animate-fadeIn"
-            style={{ padding: "24px", width: "100%", maxWidth: "400px" }}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }} onClick={() => setShowAddModal(false)}>
+          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", width: "100%", maxWidth: "400px" }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
               <h2 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>New Client</h2>
-              <button
-                onClick={() => setShowAddModal(false)}
-                style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}
-              >
+              <button onClick={() => setShowAddModal(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
                 <X style={{ width: "20px", height: "20px", color: "#6B7280" }} />
               </button>
             </div>
             <form onSubmit={addClient}>
-              <input
-                type="text"
-                className="input"
-                placeholder="Client name (e.g. iPhone, MacBook)"
-                value={newClientName}
-                onChange={(e) => setNewClientName(e.target.value)}
-                autoFocus
-              />
+              <input type="text" className="input" placeholder="Client name (e.g. iPhone, MacBook)" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
               <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary" style={{ flex: 1 }}>
-                  Cancel
-                </button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary" style={{ flex: 1 }}>Cancel</button>
                 <button type="submit" className="btn-gold" style={{ flex: 1 }} disabled={adding || !newClientName.trim()}>
                   {adding ? <Loader2 className="animate-spin" style={{ width: "18px", height: "18px" }} /> : "Create"}
                 </button>
@@ -585,53 +416,18 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Footer */}
-      <div style={{
-        position: "fixed",
-        bottom: "16px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        fontSize: "12px",
-        color: "#4B5563",
-        zIndex: 1,
-      }}>
-        Powered by{" "}
-        <a
-          href="https://github.com/wg-easy/wg-easy"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: "#6B7280", textDecoration: "none" }}
-          onMouseOver={(e) => (e.currentTarget.style.color = "#F0B90B")}
-          onMouseOut={(e) => (e.currentTarget.style.color = "#6B7280")}
-        >
-          wg-easy
-        </a>
+      <div className="footer" style={{ position: "fixed", bottom: "16px", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: "24px", fontSize: "12px", color: "#4B5563", zIndex: 1 }}>
+        <span>Powered by <a href="https://github.com/wg-easy/wg-easy" target="_blank" rel="noopener noreferrer" style={{ color: "#6B7280", textDecoration: "none" }}>wg-easy</a></span>
+        <SocialLinks />
       </div>
 
-      {/* QR Modal */}
       {qrModal && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0, 0, 0, 0.7)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 50
-        }} onClick={() => setQrModal(null)}>
-          <div
-            className="card animate-fadeIn"
-            style={{ padding: "24px", textAlign: "center" }}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }} onClick={() => setQrModal(null)}>
+          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px" }}>{qrModal.client.name}</h2>
-            <img src={qrModal.qr} alt="QR Code" style={{ borderRadius: "12px" }} />
-            <p style={{ color: "#6B7280", fontSize: "14px", marginTop: "16px" }}>
-              Scan with WireGuard app
-            </p>
-            <button onClick={() => setQrModal(null)} className="btn-secondary" style={{ marginTop: "16px" }}>
-              Close
-            </button>
+            <img src={qrModal.qr} alt="QR Code" style={{ borderRadius: "12px", maxWidth: "100%" }} />
+            <p style={{ color: "#6B7280", fontSize: "14px", marginTop: "16px" }}>Scan with WireGuard app</p>
+            <button onClick={() => setQrModal(null)} className="btn-secondary" style={{ marginTop: "16px" }}>Close</button>
           </div>
         </div>
       )}

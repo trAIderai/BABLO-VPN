@@ -1,4 +1,28 @@
 vpn.bablo.bot {
+    # Security headers
+    header {
+        # Prevent clickjacking
+        X-Frame-Options "DENY"
+        # Prevent MIME type sniffing
+        X-Content-Type-Options "nosniff"
+        # XSS protection
+        X-XSS-Protection "1; mode=block"
+        # Referrer policy
+        Referrer-Policy "strict-origin-when-cross-origin"
+        # Remove server header
+        -Server
+    }
+
+    # Rate limiting for login endpoint (requires caddy-ratelimit plugin)
+    # Uncomment if you have the plugin installed:
+    # rate_limit {
+    #     zone login {
+    #         key {remote_host}
+    #         events 5
+    #         window 1m
+    #     }
+    # }
+
     # API requests go to wg-easy
     handle /api/* {
         reverse_proxy wg-easy:51821
@@ -7,5 +31,11 @@ vpn.bablo.bot {
     # Everything else goes to our custom UI
     handle {
         reverse_proxy vpn-ui:3000
+    }
+
+    # Logging
+    log {
+        output file /var/log/caddy/access.log
+        format json
     }
 }
