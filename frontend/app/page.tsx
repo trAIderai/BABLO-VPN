@@ -22,6 +22,8 @@ import {
   ArrowUpFromLine,
   Play,
   Pause,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -87,6 +89,7 @@ export default function HomePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [togglingAll, setTogglingAll] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   // Turnstile state
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
@@ -370,12 +373,17 @@ export default function HomePage() {
             <p style={{ color: "#6B7280", marginTop: "8px" }}>WireGuard Management</p>
           </div>
           <form onSubmit={login}>
-            <input type="password" className="input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
+            <div style={{ position: "relative" }}>
+              <input type={showPassword ? "text" : "password"} className="input" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ paddingRight: "48px" }} autoFocus />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
+                {showPassword ? <EyeOff style={{ width: "20px", height: "20px", color: "#6B7280" }} /> : <Eye style={{ width: "20px", height: "20px", color: "#6B7280" }} />}
+              </button>
+            </div>
             {turnstileSiteKey && (
               <div ref={turnstileContainerRef} style={{ marginTop: "16px", display: "flex", justifyContent: "center" }} />
             )}
             {error && <p style={{ color: "#EF4444", fontSize: "14px", marginTop: "12px", textAlign: "center" }}>{error}</p>}
-            <button type="submit" className="btn-gold" style={{ width: "100%", marginTop: "16px" }} disabled={loading || (turnstileSiteKey ? !turnstileToken : false)}>
+            <button type="submit" className="btn-gold" style={{ width: "100%", marginTop: "16px" }} disabled={loading}>
               {loading ? <Loader2 className="animate-spin" style={{ width: "20px", height: "20px" }} /> : "Login"}
             </button>
           </form>
