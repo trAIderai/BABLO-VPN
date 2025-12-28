@@ -20,6 +20,8 @@ import {
   Activity,
   ArrowDownToLine,
   ArrowUpFromLine,
+  Play,
+  Pause,
 } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -63,6 +65,7 @@ export default function HomePage() {
   const [password, setPassword] = useState("");
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newClientName, setNewClientName] = useState("");
@@ -70,6 +73,7 @@ export default function HomePage() {
   const [qrModal, setQrModal] = useState<{ client: Client; qr: string } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
+  const [togglingAll, setTogglingAll] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 10000);
@@ -130,7 +134,13 @@ export default function HomePage() {
       console.error("Failed to load clients:", e);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadClients();
   };
 
   const addClient = async (e: React.FormEvent) => {
@@ -173,6 +183,29 @@ export default function HomePage() {
       loadClients();
     } catch (e) {
       console.error("Failed to toggle client:", e);
+    }
+  };
+
+  const toggleAllClients = async () => {
+    const enabledClients = clients.filter(c => c.enabled);
+    const allEnabled = enabledClients.length === clients.length;
+    const action = allEnabled ? "disable" : "enable";
+
+    setTogglingAll(true);
+    try {
+      // Toggle all clients in parallel
+      await Promise.all(
+        clients.map(client =>
+          fetch(`/api/wireguard/client/${client.id}/${allEnabled ? "disable" : "enable"}`, {
+            method: "POST",
+          })
+        )
+      );
+      await loadClients();
+    } catch (e) {
+      console.error("Failed to toggle all clients:", e);
+    } finally {
+      setTogglingAll(false);
     }
   };
 
@@ -282,6 +315,8 @@ export default function HomePage() {
   }
 
   const onlineCount = clients.filter(isOnline).length;
+  const enabledCount = clients.filter(c => c.enabled).length;
+  const allEnabled = enabledCount === clients.length && clients.length > 0;
 
   return (
     <div className="main-container" style={{ minHeight: "100vh", padding: "24px", position: "relative", overflow: "hidden" }}>
@@ -301,8 +336,42 @@ export default function HomePage() {
             </div>
           </div>
           <div className="header-actions" style={{ display: "flex", gap: "12px" }}>
-            <button onClick={loadClients} className="btn-secondary" style={{ padding: "10px 16px" }}>
-              <RefreshCw style={{ width: "18px", height: "18px" }} />
+            {/* Toggle All Button */}
+            {clients.length > 0 && (
+              <button
+                onClick={toggleAllClients}
+                className="btn-secondary"
+                style={{
+                  padding: "10px 16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: allEnabled ? "rgba(16, 185, 129, 0.1)" : "rgba(107, 114, 128, 0.1)",
+                  borderColor: allEnabled ? "rgba(16, 185, 129, 0.3)" : "rgba(107, 114, 128, 0.3)"
+                }}
+                disabled={togglingAll}
+                title={allEnabled ? "Stop All" : "Start All"}
+              >
+                {togglingAll ? (
+                  <Loader2 className="animate-spin" style={{ width: "18px", height: "18px" }} />
+                ) : allEnabled ? (
+                  <Pause style={{ width: "18px", height: "18px", color: "#10B981" }} />
+                ) : (
+                  <Play style={{ width: "18px", height: "18px", color: "#6B7280" }} />
+                )}
+              </button>
+            )}
+            {/* Refresh Button */}
+            <button
+              onClick={handleRefresh}
+              className="btn-secondary"
+              style={{ padding: "10px 16px" }}
+              disabled={refreshing}
+            >
+              <RefreshCw
+                style={{ width: "18px", height: "18px" }}
+                className={refreshing ? "animate-spin" : ""}
+              />
             </button>
             <button onClick={() => setShowAddModal(true)} className="btn-gold" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Plus style={{ width: "18px", height: "18px" }} />

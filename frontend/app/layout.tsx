@@ -17,7 +17,7 @@ export default function RootLayout({
         {/* Preload custom font for faster loading */}
         <link
           rel="preload"
-          href="https://cdn.jsdelivr.net/gh/rsperberg/foundation-titles-hand@main/FoundationTitlesHand.ttf"
+          href="/fonts/FoundationTitlesHand.ttf"
           as="font"
           type="font/ttf"
           crossOrigin="anonymous"
