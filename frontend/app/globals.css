@@ -189,57 +189,104 @@ body {
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
+  /* Stats grid - 3 columns but compact on mobile */
   .stats-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
   }
+
+  .stats-grid .card {
+    padding: 12px !important;
+    border-radius: 12px;
+  }
+
+  .stats-grid .stat-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .stats-grid .stat-label {
+    font-size: 10px !important;
+  }
+
+  .stats-grid .stat-value {
+    font-size: 18px !important;
+  }
+
+  /* Clients grid - single column on mobile */
   .clients-grid {
     grid-template-columns: 1fr !important;
   }
+
+  /* Header - stack vertically on mobile */
   .header {
     flex-direction: column !important;
     gap: 16px !important;
     align-items: stretch !important;
   }
+
   .header-left {
     justify-content: center;
   }
+
   .header-actions {
     justify-content: center;
   }
+
+  /* Modal - full width on mobile */
   .modal-content {
     margin: 16px;
     max-width: calc(100% - 32px) !important;
   }
+
+  /* Client card actions - wrap on small screens */
   .client-actions {
     flex-wrap: wrap;
   }
+
+  /* Splash text smaller on mobile */
   .splash-title {
     font-size: 2.5rem !important;
   }
+
+  /* Login card padding */
   .login-card {
     margin: 16px;
     padding: 24px !important;
   }
+
+  /* Footer adjustments */
   .footer {
     flex-direction: column;
     gap: 12px;
     text-align: center;
   }
+
+  /* Main container padding */
   .main-container {
     padding: 16px !important;
+  }
+
+  /* Background logo bigger on mobile */
+  .bg-logo {
+    width: 200vw !important;
+    height: 200vh !important;
   }
 }
 
 @media (max-width: 480px) {
-  .stats-grid .card {
-    padding: 16px !important;
-  }
   .btn-gold, .btn-secondary {
     padding: 10px 16px;
     font-size: 14px;
   }
+
   .splash-title {
     font-size: 2rem !important;
+  }
+
+  /* Even more compact stats on very small screens */
+  .stats-grid .stat-value {
+    font-size: 16px !important;
   }
 }
 

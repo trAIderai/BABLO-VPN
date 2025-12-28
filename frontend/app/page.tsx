@@ -285,7 +285,8 @@ export default function HomePage() {
 
   return (
     <div className="main-container" style={{ minHeight: "100vh", padding: "24px", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "120vw", height: "120vh", opacity: 0.10, pointerEvents: "none", zIndex: 0 }}>
+      {/* Background logo - bigger size */}
+      <div className="bg-logo" style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "180vw", height: "180vh", opacity: 0.12, pointerEvents: "none", zIndex: 0 }}>
         <Image src="/splash-bg.png" alt="" fill style={{ objectFit: "contain" }} />
       </div>
       <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
@@ -310,31 +311,32 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Stats Grid with classes for mobile */}
         <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px", marginBottom: "24px" }}>
           <div className="card" style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <Users style={{ width: "20px", height: "20px", color: "#F0B90B" }} />
+              <Users className="stat-icon" style={{ width: "20px", height: "20px", color: "#F0B90B", flexShrink: 0 }} />
               <div>
-                <p style={{ color: "#6B7280", fontSize: "12px", margin: 0 }}>Total Clients</p>
-                <p style={{ fontSize: "24px", fontWeight: 600, margin: 0 }}>{clients.length}</p>
+                <p className="stat-label" style={{ color: "#6B7280", fontSize: "12px", margin: 0 }}>Total Clients</p>
+                <p className="stat-value" style={{ fontSize: "24px", fontWeight: 600, margin: 0 }}>{clients.length}</p>
               </div>
             </div>
           </div>
           <div className="card" style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <Activity style={{ width: "20px", height: "20px", color: "#10B981" }} />
+              <Activity className="stat-icon" style={{ width: "20px", height: "20px", color: "#10B981", flexShrink: 0 }} />
               <div>
-                <p style={{ color: "#6B7280", fontSize: "12px", margin: 0 }}>Online Now</p>
-                <p style={{ fontSize: "24px", fontWeight: 600, margin: 0, color: "#10B981" }}>{onlineCount}</p>
+                <p className="stat-label" style={{ color: "#6B7280", fontSize: "12px", margin: 0 }}>Online Now</p>
+                <p className="stat-value" style={{ fontSize: "24px", fontWeight: 600, margin: 0, color: "#10B981" }}>{onlineCount}</p>
               </div>
             </div>
           </div>
           <div className="card" style={{ padding: "20px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-              <ArrowDownToLine style={{ width: "20px", height: "20px", color: "#3B82F6" }} />
+              <ArrowDownToLine className="stat-icon" style={{ width: "20px", height: "20px", color: "#3B82F6", flexShrink: 0 }} />
               <div>
-                <p style={{ color: "#6B7280", fontSize: "12px", margin: 0 }}>Total Traffic</p>
-                <p style={{ fontSize: "24px", fontWeight: 600, margin: 0 }}>{formatBytes(clients.reduce((sum, c) => sum + c.transferRx + c.transferTx, 0))}</p>
+                <p className="stat-label" style={{ color: "#6B7280", fontSize: "12px", margin: 0 }}>Total Traffic</p>
+                <p className="stat-value" style={{ fontSize: "24px", fontWeight: 600, margin: 0 }}>{formatBytes(clients.reduce((sum, c) => sum + c.transferRx + c.transferTx, 0))}</p>
               </div>
             </div>
           </div>
