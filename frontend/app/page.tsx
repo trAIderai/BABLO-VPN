@@ -247,7 +247,7 @@ export default function HomePage() {
   };
 
   const deleteClient = async (client: Client) => {
-    if (!confirm("Delete "" + client.name + ""?")) return;
+    if (!confirm(`Delete "${client.name}"?`)) return;
     try {
       await fetch("/api/wireguard/client/" + client.id, { method: "DELETE" });
       loadClients();
