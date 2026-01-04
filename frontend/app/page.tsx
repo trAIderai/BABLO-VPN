@@ -32,6 +32,7 @@ import {
   Monitor,
   Apple,
   BookOpen,
+  Link2,
 } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -100,6 +101,7 @@ export default function HomePage() {
   const [qrModal, setQrModal] = useState<{ client: Client; qr: string } | null>(null);
   const [multiModal, setMultiModal] = useState<Client | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedVless, setCopiedVless] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   const [togglingAll, setTogglingAll] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -381,6 +383,20 @@ export default function HomePage() {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error("Failed to download SingBox config:", e);
+    }
+  };
+
+  const copyVlessUrl = async (client: Client) => {
+    try {
+      const res = await fetch("/api/vless/" + client.id);
+      const data = await res.json();
+      if (data.url) {
+        await navigator.clipboard.writeText(data.url);
+        setCopiedVless(true);
+        setTimeout(() => setCopiedVless(false), 2000);
+      }
+    } catch (e) {
+      console.error("Failed to copy VLESS URL:", e);
     }
   };
 
@@ -736,13 +752,23 @@ export default function HomePage() {
               </a>
             </div>
 
+            <div style={{ background: "rgba(16, 185, 129, 0.05)", borderRadius: "12px", padding: "16px", marginBottom: "20px", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
+              <p style={{ color: "#9CA3AF", fontSize: "13px", margin: "0 0 12px", lineHeight: "1.5" }}>
+                <strong style={{ color: "#10B981" }}>Для NekoBox/v2rayN:</strong> скопируйте ссылку и вставьте через «Программа» → «Добавить профиль из буфера обмена» (или Ctrl+V)
+              </p>
+              <button onClick={() => copyVlessUrl(multiModal)} className="btn-secondary" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: copiedVless ? "rgba(16, 185, 129, 0.15)" : "rgba(16, 185, 129, 0.1)", borderColor: "rgba(16, 185, 129, 0.3)" }}>
+                {copiedVless ? <Check style={{ width: "16px", height: "16px", color: "#10B981" }} /> : <Link2 style={{ width: "16px", height: "16px", color: "#10B981" }} />}
+                <span style={{ color: "#10B981" }}>{copiedVless ? "Скопировано!" : "Скопировать VLESS ссылку"}</span>
+              </button>
+            </div>
+
             <div style={{ display: "flex", gap: "12px" }}>
               <button onClick={() => setMultiModal(null)} className="btn-secondary" style={{ flex: 1 }}>
                 Закрыть
               </button>
               <button onClick={() => { downloadSingBoxConfig(multiModal); setMultiModal(null); }} className="btn-gold" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
                 <Download style={{ width: "16px", height: "16px" }} />
-                Скачать конфиг
+                JSON (SingBox)
               </button>
             </div>
           </div>
