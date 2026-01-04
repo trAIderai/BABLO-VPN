@@ -26,6 +26,9 @@
     handle /api/vless-url {
         reverse_proxy vpn-ui:3000
     }
+    handle /api/multi-config {
+        reverse_proxy vpn-ui:3000
+    }
     handle /api/singbox/* {
         reverse_proxy vpn-ui:3000
     }

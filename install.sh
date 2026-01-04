@@ -98,8 +98,9 @@ if command -v ufw &> /dev/null; then
     ufw allow 443/tcp     # HTTPS
     ufw allow 51820/udp   # WireGuard
     ufw allow 2053/tcp    # 3x-ui Admin Panel
-    ufw allow 8443/tcp    # VLESS/Trojan
-    ufw allow 8443/udp    # Hysteria2
+    ufw allow 8443/tcp    # VLESS Reality
+    ufw allow 8444/tcp    # Trojan Reality
+    ufw allow 8445/udp    # Hysteria2
     echo "y" | ufw enable || true
 fi
 

@@ -39,6 +39,12 @@ services:
       - VLESS_UUID=${VLESS_UUID}
       - REALITY_PUBLIC_KEY=${REALITY_PUBLIC_KEY}
       - REALITY_SHORT_ID=${REALITY_SHORT_ID}
+      # Trojan settings
+      - TROJAN_PORT=${TROJAN_PORT:-8444}
+      - TROJAN_PASSWORD=${TROJAN_PASSWORD}
+      # Hysteria2 settings
+      - HYSTERIA2_PORT=${HYSTERIA2_PORT:-8445}
+      - HYSTERIA2_PASSWORD=${HYSTERIA2_PASSWORD}
     restart: unless-stopped
     depends_on:
       - wg-easy
@@ -74,8 +80,9 @@ services:
       - xray-ui-certs:/root/cert
     ports:
       - "2053:2053"     # Admin panel
-      - "8443:8443"     # VLESS/Trojan
-      - "8443:8443/udp" # Hysteria
+      - "8443:8443"     # VLESS Reality
+      - "8444:8444"     # Trojan Reality
+      - "8445:8445/udp" # Hysteria2
     restart: unless-stopped
     tty: true
 
