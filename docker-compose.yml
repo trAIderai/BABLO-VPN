@@ -33,9 +33,15 @@ services:
       - NODE_ENV=production
       - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
+      # VLESS Reality settings for SingBox config generator
+      - WG_HOST=${WG_HOST}
+      - VLESS_PORT=8443
+      - REALITY_PUBLIC_KEY=1ULl7LzQbfyx6jS2VxwwAomvxr-_vOFcX-gqF-7DUTc
+      - REALITY_SHORT_ID=6cf08f5fd8c7f7
     restart: unless-stopped
     depends_on:
       - wg-easy
+      - xray-ui
 
   caddy:
     image: caddy:2-alpine
