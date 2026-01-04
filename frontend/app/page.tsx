@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Shield,
   Plus,
@@ -30,6 +31,7 @@ import {
   Smartphone,
   Monitor,
   Apple,
+  BookOpen,
 } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -697,6 +699,10 @@ export default function HomePage() {
               <p style={{ color: "#9CA3AF", fontSize: "14px", margin: 0, lineHeight: "1.5" }}>
                 Этот конфиг включает несколько протоколов для максимальной защиты и обхода блокировок. Для его использования нужен специальный клиент.
               </p>
+              <Link href="/guide" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#F0B90B", fontSize: "14px", marginTop: "12px", textDecoration: "none" }}>
+                <BookOpen style={{ width: "16px", height: "16px" }} />
+                Подробные инструкции по настройке
+              </Link>
             </div>
 
             <p style={{ fontSize: "14px", color: "#9CA3AF", marginBottom: "12px" }}>Установите приложение:</p>
