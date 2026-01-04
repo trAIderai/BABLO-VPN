@@ -13,11 +13,20 @@ vpn.bablo.bot {
         -Server
     }
 
-    # Our custom API routes (auth, config) go to vpn-ui
+    # Our custom API routes go to vpn-ui
     handle /api/auth {
         reverse_proxy vpn-ui:3000
     }
     handle /api/config {
+        reverse_proxy vpn-ui:3000
+    }
+    handle /api/vless/* {
+        reverse_proxy vpn-ui:3000
+    }
+    handle /api/singbox/* {
+        reverse_proxy vpn-ui:3000
+    }
+    handle /api/xray/* {
         reverse_proxy vpn-ui:3000
     }
 
