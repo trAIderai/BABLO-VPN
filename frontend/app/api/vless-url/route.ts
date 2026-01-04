@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server';
 
-// UUIDs registered in 3x-ui panel
-const REGISTERED_UUIDS = [
-  '***REDACTED-UUID***',
-  '***REDACTED-UUID***',
-];
+export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const clientId = searchParams.get('id') || 'default';
-
-    const SERVER_IP = process.env.WG_HOST || '91.184.250.14';
+    // All values must come from environment variables
+    const SERVER_IP = process.env.WG_HOST;
     const VLESS_PORT = process.env.VLESS_PORT || '8443';
-    const REALITY_PUBLIC_KEY = process.env.REALITY_PUBLIC_KEY || '1ULl7LzQbfyx6jS2VxwwAomvxr-_vOFcX-gqF-7DUTc';
-    const REALITY_SHORT_ID = process.env.REALITY_SHORT_ID || '6cf08f5fd8c7f7';
+    const VLESS_UUID = process.env.VLESS_UUID;
+    const REALITY_PUBLIC_KEY = process.env.REALITY_PUBLIC_KEY;
+    const REALITY_SHORT_ID = process.env.REALITY_SHORT_ID;
 
-    // Use first registered UUID (all users share the same VLESS client for now)
-    const uuid = REGISTERED_UUIDS[0];
+    // Check required env vars
+    if (!SERVER_IP || !VLESS_UUID || !REALITY_PUBLIC_KEY || !REALITY_SHORT_ID) {
+      return NextResponse.json({
+        error: 'VLESS not configured. Required env vars: WG_HOST, VLESS_UUID, REALITY_PUBLIC_KEY, REALITY_SHORT_ID',
+        configured: false,
+      }, { status: 503 });
+    }
 
     // Build VLESS URL
     const vlessParams = new URLSearchParams({
@@ -31,13 +31,14 @@ export async function GET(request: Request) {
       type: 'tcp',
     });
 
-    const vlessUrl = `vless://${uuid}@${SERVER_IP}:${VLESS_PORT}?${vlessParams.toString()}#BABLO-VPN`;
+    const vlessUrl = `vless://${VLESS_UUID}@${SERVER_IP}:${VLESS_PORT}?${vlessParams.toString()}#BABLO-VPN`;
 
     return NextResponse.json({
       url: vlessUrl,
-      uuid: uuid,
+      uuid: VLESS_UUID,
       server: SERVER_IP,
       port: VLESS_PORT,
+      configured: true,
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';

@@ -40,8 +40,8 @@ docker compose up -d
 
 | Service | URL/Port |
 |---------|----------|
-| **WireGuard UI** | https://vpn.bablo.bot |
-| **3x-ui Panel** | http://IP:2053 |
+| **WireGuard UI** | https://YOUR_DOMAIN |
+| **3x-ui Panel** | http://YOUR_IP:2053 |
 | **WireGuard** | 51820/udp |
 | **VLESS/Trojan** | 8443/tcp |
 | **Hysteria2** | 8443/udp |

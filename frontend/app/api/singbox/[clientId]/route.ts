@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const WG_EASY_URL = 'http://wg-easy:51821';
-const SERVER_IP = process.env.WG_HOST || '91.184.250.14';
+const SERVER_IP = process.env.WG_HOST || '';
 const VLESS_PORT = process.env.VLESS_PORT || '8443';
 
 interface SingBoxConfig {

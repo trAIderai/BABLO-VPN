@@ -33,11 +33,12 @@ services:
       - NODE_ENV=production
       - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY}
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
-      # VLESS Reality settings for SingBox config generator
+      # VLESS Reality settings (extracted from 3x-ui after setup)
       - WG_HOST=${WG_HOST}
-      - VLESS_PORT=8443
-      - REALITY_PUBLIC_KEY=1ULl7LzQbfyx6jS2VxwwAomvxr-_vOFcX-gqF-7DUTc
-      - REALITY_SHORT_ID=6cf08f5fd8c7f7
+      - VLESS_PORT=${VLESS_PORT:-8443}
+      - VLESS_UUID=${VLESS_UUID}
+      - REALITY_PUBLIC_KEY=${REALITY_PUBLIC_KEY}
+      - REALITY_SHORT_ID=${REALITY_SHORT_ID}
     restart: unless-stopped
     depends_on:
       - wg-easy
@@ -46,6 +47,8 @@ services:
   caddy:
     image: caddy:2-alpine
     container_name: caddy
+    environment:
+      - WG_HOST=${WG_HOST}
     ports:
       - "80:80"
       - "443:443"

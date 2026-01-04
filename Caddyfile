@@ -1,4 +1,4 @@
-vpn.bablo.bot {
+{$WG_HOST} {
     # Security headers
     header {
         # Prevent clickjacking
