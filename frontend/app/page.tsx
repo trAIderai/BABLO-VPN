@@ -344,40 +344,59 @@ export default function HomePage() {
 
   // Render Turnstile widget when ready
   useEffect(() => {
-    if (!turnstileSiteKey || !turnstileContainerRef.current || session?.authenticated) return;
+    if (!turnstileSiteKey) {
+      return;
+    }
+    if (session?.authenticated) {
+      return;
+    }
 
     const renderWidget = () => {
-      if (window.turnstile && turnstileContainerRef.current && !turnstileWidgetId.current) {
-        try {
-          setTurnstileStatus("rendering widget...");
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          turnstileWidgetId.current = window.turnstile.render(turnstileContainerRef.current, {
-            sitekey: turnstileSiteKey,
-            callback: (token: string) => {
-              setTurnstileToken(token);
-              setTurnstileStatus("verified!");
-            },
-            "error-callback": () => setTurnstileStatus("WIDGET ERROR"),
-            theme: "dark",
-          } as any);
-          setTurnstileStatus("widget rendered, waiting...");
-        } catch (err) {
-          setTurnstileStatus("RENDER ERROR: " + String(err));
-        }
+      const container = turnstileContainerRef.current;
+      if (!container) {
+        setTurnstileStatus("ERROR: no container ref");
+        return;
+      }
+      if (!window.turnstile) {
+        setTurnstileStatus("waiting for turnstile...");
+        return;
+      }
+      if (turnstileWidgetId.current) {
+        return; // already rendered
+      }
+
+      try {
+        setTurnstileStatus("calling render()...");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        turnstileWidgetId.current = window.turnstile.render(container, {
+          sitekey: turnstileSiteKey,
+          callback: (token: string) => {
+            setTurnstileToken(token);
+            setTurnstileStatus("verified!");
+          },
+          "error-callback": () => setTurnstileStatus("WIDGET ERROR"),
+          theme: "dark",
+        } as any);
+        setTurnstileStatus("render() done, widgetId=" + turnstileWidgetId.current);
+      } catch (err) {
+        setTurnstileStatus("RENDER ERROR: " + String(err));
       }
     };
 
-    if (window.turnstile) {
-      renderWidget();
-    } else {
-      const interval = setInterval(() => {
-        if (window.turnstile) {
-          renderWidget();
-          clearInterval(interval);
-        }
-      }, 100);
-      return () => clearInterval(interval);
-    }
+    // Try immediately
+    renderWidget();
+
+    // Also poll in case script loads later
+    const interval = setInterval(() => {
+      if (window.turnstile && !turnstileWidgetId.current) {
+        renderWidget();
+      }
+      if (turnstileWidgetId.current) {
+        clearInterval(interval);
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
   }, [turnstileSiteKey, session]);
 
   useEffect(() => {
