@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
-  Shield,
   Plus,
   Trash2,
   Download,
@@ -30,6 +29,7 @@ import {
   Monitor,
   Apple,
 } from "lucide-react";
+import { LogoB } from "./components/logos";
 import QRCode from "qrcode";
 
 declare global {
@@ -625,8 +625,8 @@ export default function HomePage() {
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
         <div className="card animate-fadeIn login-card" style={{ padding: "40px", width: "100%", maxWidth: "400px" }}>
           <div style={{ textAlign: "center", marginBottom: "32px" }}>
-            <div style={{ width: "64px", height: "64px", borderRadius: "16px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-              <Shield style={{ width: "32px", height: "32px", color: "#F0B90B" }} />
+            <div style={{ margin: "0 auto 16px", display: "flex", justifyContent: "center" }}>
+              <LogoB size={64} />
             </div>
             <h1 className="font-bablo" style={{ fontSize: "28px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
             <p style={{ color: "#6B7280", marginTop: "8px" }}>WireGuard Management</p>
@@ -676,9 +676,7 @@ export default function HomePage() {
       <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 1 }}>
         <div className="header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
           <div className="header-left" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            <div style={{ width: "48px", height: "48px", borderRadius: "12px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Shield style={{ width: "24px", height: "24px", color: "#F0B90B" }} />
-            </div>
+            <LogoB size={48} />
             <div>
               <h1 className="font-bablo" style={{ fontSize: "22px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
               <p style={{ color: "#6B7280", fontSize: "14px", margin: 0 }}>WireGuard Clients</p>

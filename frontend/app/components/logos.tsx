@@ -1,17 +1,27 @@
 "use client";
 
-// Logo 1: Simple stylized "B"
+// Main Logo: Bold "B" letter in Foundation font
 export const LogoB = ({ size = 48 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="4" y="4" width="40" height="40" rx="12" fill="rgba(240, 185, 11, 0.15)"/>
-    <path
-      d="M16 12V36M16 12H28C32.4183 12 36 15.5817 36 20C36 22.5 34.5 24 32 24M16 24H30C34.4183 24 38 27.5817 38 32C38 34.5 35.5 36 32 36H16M16 24V12"
-      stroke="#F0B90B"
-      strokeWidth="4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
+  <div style={{
+    width: size,
+    height: size,
+    borderRadius: size * 0.25,
+    background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}>
+    <span
+      className="font-bablo"
+      style={{
+        fontSize: size * 0.7,
+        color: "#F0B90B",
+        lineHeight: 1,
+      }}
+    >
+      B
+    </span>
+  </div>
 );
 
 // Logo 2: Monogram "BV"
