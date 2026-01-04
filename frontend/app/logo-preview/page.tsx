@@ -1,145 +1,61 @@
 "use client";
 
 import {
-  LogoNetwork,
-  LogoTunnel,
-  LogoCrypto,
-  LogoShieldFlow,
-  LogoMinimalB,
-  LogoInfinity,
+  LogoB,
+  LogoBV,
+  LogoDot,
+  LogoKey,
+  LogoBolt,
+  LogoShield,
+  LogoLock,
+  LogoBrackets,
 } from "../components/logos";
 
 export default function LogoPreview() {
   const logos = [
-    { name: "Network B", description: "Геометрическая B с узлами сети", Component: LogoNetwork },
-    { name: "Tunnel", description: "VPN туннель / портал", Component: LogoTunnel },
-    { name: "Crypto Lock", description: "Крипто-стиль замок в гексагоне", Component: LogoCrypto },
-    { name: "Shield Flow", description: "Динамичный щит с потоком данных", Component: LogoShieldFlow },
-    { name: "Minimal B", description: "Минималистичная B", Component: LogoMinimalB },
-    { name: "Infinity", description: "Бесконечная защита", Component: LogoInfinity },
+    { name: "1. B", Component: LogoB },
+    { name: "2. BV", Component: LogoBV },
+    { name: "3. Dot", Component: LogoDot },
+    { name: "4. Key", Component: LogoKey },
+    { name: "5. Bolt", Component: LogoBolt },
+    { name: "6. Shield", Component: LogoShield },
+    { name: "7. Lock", Component: LogoLock },
+    { name: "8. Brackets", Component: LogoBrackets },
   ];
 
   return (
     <div style={{
       minHeight: "100vh",
       background: "#08090B",
-      padding: "40px",
+      padding: "40px 20px",
       fontFamily: "system-ui, sans-serif",
     }}>
       <h1 style={{
         color: "#F0B90B",
-        fontSize: "32px",
+        fontSize: "24px",
         textAlign: "center",
-        marginBottom: "48px",
-        fontWeight: 600,
-        letterSpacing: "0.05em",
+        marginBottom: "40px",
       }}>
-        BABLO VPN — Выбери логотип
+        Выбери логотип
       </h1>
 
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-        gap: "24px",
-        maxWidth: "1200px",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        gap: "20px",
+        maxWidth: "600px",
         margin: "0 auto",
       }}>
-        {logos.map(({ name, description, Component }) => (
-          <div
-            key={name}
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(240, 185, 11, 0.2)",
-              borderRadius: "16px",
-              padding: "32px",
-              textAlign: "center",
-              transition: "all 0.3s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "rgba(240, 185, 11, 0.5)";
-              e.currentTarget.style.background = "rgba(240, 185, 11, 0.05)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "rgba(240, 185, 11, 0.2)";
-              e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
-            }}
-          >
-            {/* Logo display */}
+        {logos.map(({ name, Component }) => (
+          <div key={name} style={{ textAlign: "center" }}>
             <div style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: "24px",
+              width: "64px",
+              height: "64px",
+              margin: "0 auto 8px",
             }}>
-              <div style={{
-                width: "80px",
-                height: "80px",
-                borderRadius: "16px",
-                background: "linear-gradient(135deg, rgba(240, 185, 11, 0.15) 0%, rgba(240, 185, 11, 0.05) 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
-                <Component size={48} />
-              </div>
+              <Component size={64} />
             </div>
-
-            {/* Name */}
-            <h3 style={{
-              color: "#E5E7EB",
-              fontSize: "18px",
-              fontWeight: 600,
-              marginBottom: "8px",
-            }}>
-              {name}
-            </h3>
-
-            {/* Description */}
-            <p style={{
-              color: "#6B7280",
-              fontSize: "14px",
-              marginBottom: "20px",
-            }}>
-              {description}
-            </p>
-
-            {/* Preview in header context */}
-            <div style={{
-              background: "rgba(0, 0, 0, 0.4)",
-              borderRadius: "12px",
-              padding: "16px",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-            }}>
-              <div style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}>
-                <Component size={24} />
-              </div>
-              <div style={{ textAlign: "left" }}>
-                <div style={{
-                  color: "#F0B90B",
-                  fontSize: "16px",
-                  fontWeight: 600,
-                  letterSpacing: "0.05em",
-                }}>
-                  BABLO VPN
-                </div>
-                <div style={{
-                  color: "#6B7280",
-                  fontSize: "12px",
-                }}>
-                  WireGuard Clients
-                </div>
-              </div>
-            </div>
+            <span style={{ color: "#9CA3AF", fontSize: "12px" }}>{name}</span>
           </div>
         ))}
       </div>
@@ -147,10 +63,10 @@ export default function LogoPreview() {
       <p style={{
         color: "#6B7280",
         textAlign: "center",
-        marginTop: "48px",
+        marginTop: "40px",
         fontSize: "14px",
       }}>
-        Напиши номер или название логотипа который нравится
+        Напиши номер (1-8)
       </p>
     </div>
   );
