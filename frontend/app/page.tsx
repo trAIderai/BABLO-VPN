@@ -24,6 +24,8 @@ import {
   Pause,
   Eye,
   EyeOff,
+  Zap,
+  FileJson,
 } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -53,7 +55,10 @@ interface Client {
   latestHandshakeAt: string | null;
   transferRx: number;
   transferTx: number;
+  protectionType?: 'standard' | 'advanced';
 }
+
+type ProtectionType = 'standard' | 'advanced';
 
 interface Session {
   authenticated: boolean;
@@ -84,6 +89,7 @@ export default function HomePage() {
   const [error, setError] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newClientName, setNewClientName] = useState("");
+  const [protectionType, setProtectionType] = useState<ProtectionType>('standard');
   const [adding, setAdding] = useState(false);
   const [qrModal, setQrModal] = useState<{ client: Client; qr: string } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -232,13 +238,38 @@ export default function HomePage() {
     if (!newClientName.trim()) return;
     setAdding(true);
     try {
+      // Add [PRO] suffix for advanced protection
+      const clientName = protectionType === 'advanced'
+        ? `${newClientName.trim()} [PRO]`
+        : newClientName.trim();
+
+      // Create WireGuard client
       const res = await fetch("/api/wireguard/client", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newClientName.trim() }),
+        body: JSON.stringify({ name: clientName }),
       });
+
       if (res.ok) {
+        // If advanced protection, also create VLESS client
+        if (protectionType === 'advanced') {
+          try {
+            await fetch("/api/xray", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                inboundId: 1,
+                email: clientName,
+                uuid: crypto.randomUUID(),
+              }),
+            });
+          } catch (xrayError) {
+            console.error("Failed to create VLESS client:", xrayError);
+          }
+        }
+
         setNewClientName("");
+        setProtectionType('standard');
         setShowAddModal(false);
         loadClients();
       }
@@ -328,6 +359,27 @@ export default function HomePage() {
     } catch (e) {
       console.error("Failed to copy config:", e);
     }
+  };
+
+  const downloadSingBoxConfig = async (client: Client) => {
+    try {
+      const res = await fetch("/api/singbox/" + client.id);
+      const config = await res.text();
+      const blob = new Blob([config], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = client.name + "-singbox.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Failed to download SingBox config:", e);
+    }
+  };
+
+  const isAdvancedClient = (client: Client) => {
+    // Check if client name ends with [PRO] or has advanced marker
+    return client.name.includes('[PRO]') || client.protectionType === 'advanced';
   };
 
   const formatBytes = (bytes: number) => {
@@ -455,7 +507,7 @@ export default function HomePage() {
             </button>
             <button onClick={() => setShowAddModal(true)} className="btn-gold" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Plus style={{ width: "18px", height: "18px" }} />
-              Add Client
+              Добавить
             </button>
           </div>
         </div>
@@ -498,7 +550,15 @@ export default function HomePage() {
                 <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                   <div style={{ width: "10px", height: "10px", borderRadius: "50%", flexShrink: 0 }} className={isOnline(client) ? "status-online" : "status-offline"} />
                   <div>
-                    <h3 style={{ fontSize: "16px", fontWeight: 500, margin: 0 }}>{client.name}</h3>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <h3 style={{ fontSize: "16px", fontWeight: 500, margin: 0 }}>{client.name.replace(' [PRO]', '')}</h3>
+                      {isAdvancedClient(client) && (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", padding: "2px 8px", borderRadius: "6px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", fontSize: "10px", fontWeight: 600, color: "#F0B90B", textTransform: "uppercase" }}>
+                          <Zap style={{ width: "10px", height: "10px" }} />
+                          PRO
+                        </span>
+                      )}
+                    </div>
                     <p style={{ color: "#6B7280", fontSize: "12px", margin: "4px 0 0" }}>{client.address}</p>
                   </div>
                 </div>
@@ -516,14 +576,19 @@ export default function HomePage() {
                   <span style={{ color: "#9CA3AF" }}>{formatBytes(client.transferTx)}</span>
                 </div>
               </div>
-              <div className="client-actions" style={{ display: "flex", gap: "8px" }}>
-                <button onClick={() => downloadConfig(client)} className="btn-secondary" style={{ flex: 1, padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}>
+              <div className="client-actions" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                <button onClick={() => downloadConfig(client)} className="btn-secondary" style={{ flex: 1, minWidth: "80px", padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}>
                   <Download style={{ width: "14px", height: "14px" }} />
-                  Config
+                  WG
                 </button>
-                <button onClick={() => showQR(client)} className="btn-secondary" style={{ flex: 1, padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}>
+                {isAdvancedClient(client) && (
+                  <button onClick={() => downloadSingBoxConfig(client)} className="btn-secondary" style={{ flex: 1, minWidth: "80px", padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px", background: "rgba(240, 185, 11, 0.1)", borderColor: "rgba(240, 185, 11, 0.3)" }}>
+                    <FileJson style={{ width: "14px", height: "14px", color: "#F0B90B" }} />
+                    <span style={{ color: "#F0B90B" }}>Multi</span>
+                  </button>
+                )}
+                <button onClick={() => showQR(client)} className="btn-secondary" style={{ padding: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <QrCode style={{ width: "14px", height: "14px" }} />
-                  QR
                 </button>
                 <button onClick={() => copyConfig(client)} className="btn-secondary" style={{ padding: "8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   {copiedId === client.id ? <Check style={{ width: "14px", height: "14px", color: "#10B981" }} /> : <Copy style={{ width: "14px", height: "14px" }} />}
@@ -547,19 +612,44 @@ export default function HomePage() {
 
       {showAddModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }} onClick={() => setShowAddModal(false)}>
-          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", width: "100%", maxWidth: "400px" }} onClick={(e) => e.stopPropagation()}>
+          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", width: "100%", maxWidth: "440px" }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h2 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>New Client</h2>
+              <h2 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>Новый клиент</h2>
               <button onClick={() => setShowAddModal(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
                 <X style={{ width: "20px", height: "20px", color: "#6B7280" }} />
               </button>
             </div>
             <form onSubmit={addClient}>
-              <input type="text" className="input" placeholder="Client name (e.g. iPhone, MacBook)" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
-              <div style={{ display: "flex", gap: "12px", marginTop: "20px" }}>
-                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary" style={{ flex: 1 }}>Cancel</button>
+              <input type="text" className="input" placeholder="Имя (например iPhone, MacBook)" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
+
+              <div style={{ marginTop: "20px" }}>
+                <p style={{ fontSize: "14px", color: "#9CA3AF", marginBottom: "12px" }}>Тип защиты:</p>
+
+                <label style={{ display: "block", padding: "14px 16px", borderRadius: "12px", border: protectionType === 'standard' ? "2px solid #F0B90B" : "1px solid rgba(255,255,255,0.1)", background: protectionType === 'standard' ? "rgba(240, 185, 11, 0.1)" : "transparent", cursor: "pointer", marginBottom: "10px", transition: "all 0.2s" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <input type="radio" name="protectionType" checked={protectionType === 'standard'} onChange={() => setProtectionType('standard')} style={{ accentColor: "#F0B90B" }} />
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: "15px" }}>Стандартная защита</div>
+                      <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "2px" }}>Быстрое и стабильное соединение</div>
+                    </div>
+                  </div>
+                </label>
+
+                <label style={{ display: "block", padding: "14px 16px", borderRadius: "12px", border: protectionType === 'advanced' ? "2px solid #F0B90B" : "1px solid rgba(255,255,255,0.1)", background: protectionType === 'advanced' ? "rgba(240, 185, 11, 0.1)" : "transparent", cursor: "pointer", transition: "all 0.2s" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                    <input type="radio" name="protectionType" checked={protectionType === 'advanced'} onChange={() => setProtectionType('advanced')} style={{ accentColor: "#F0B90B" }} />
+                    <div>
+                      <div style={{ fontWeight: 500, fontSize: "15px" }}>Продвинутая защита</div>
+                      <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "2px" }}>Обход блокировок + резервные протоколы</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn-secondary" style={{ flex: 1 }}>Отмена</button>
                 <button type="submit" className="btn-gold" style={{ flex: 1 }} disabled={adding || !newClientName.trim()}>
-                  {adding ? <Loader2 className="animate-spin" style={{ width: "18px", height: "18px" }} /> : "Create"}
+                  {adding ? <Loader2 className="animate-spin" style={{ width: "18px", height: "18px" }} /> : "Создать"}
                 </button>
               </div>
             </form>
