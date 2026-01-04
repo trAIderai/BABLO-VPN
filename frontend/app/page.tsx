@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Shield,
   Plus,
@@ -12,7 +11,6 @@ import {
   Power,
   Loader2,
   Wifi,
-  WifiOff,
   Copy,
   Check,
   X,
@@ -31,8 +29,6 @@ import {
   Smartphone,
   Monitor,
   Apple,
-  BookOpen,
-  Link2,
 } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -72,6 +68,202 @@ interface Session {
   requiresPassword: boolean;
 }
 
+// Protocol descriptions for user guidance
+const PROTOCOL_INFO: Record<string, { icon: string; tip: string; color: string }> = {
+  'VLESS Reality': {
+    icon: '⚡',
+    tip: 'Основной протокол. Быстрый, обходит DPI.',
+    color: '#F0B90B',
+  },
+  'Trojan Reality': {
+    icon: '🛡️',
+    tip: 'Резерв если VLESS заблокирован.',
+    color: '#3B82F6',
+  },
+  'Hysteria2': {
+    icon: '🚀',
+    tip: 'Для плохих сетей: метро, мобильный.',
+    color: '#10B981',
+  },
+};
+
+// Multi Protocol Modal Component
+const MultiProtocolModal = ({
+  client,
+  protocols,
+  setProtocols,
+  copiedProtocol,
+  setCopiedProtocol,
+  onClose,
+  onDownloadSingBox,
+}: {
+  client: Client;
+  protocols: Array<{name: string; url: string | null; configured: boolean; description: string}>;
+  setProtocols: React.Dispatch<React.SetStateAction<Array<{name: string; url: string | null; configured: boolean; description: string}>>>;
+  copiedProtocol: string | null;
+  setCopiedProtocol: React.Dispatch<React.SetStateAction<string | null>>;
+  onClose: () => void;
+  onDownloadSingBox: () => void;
+}) => {
+  const [loadingProtocols, setLoadingProtocols] = useState(true);
+
+  useEffect(() => {
+    const fetchProtocols = async () => {
+      try {
+        const res = await fetch('/api/multi-config');
+        const data = await res.json();
+        if (data.protocols) {
+          setProtocols(data.protocols);
+        }
+      } catch (e) {
+        console.error('Failed to load protocols:', e);
+      } finally {
+        setLoadingProtocols(false);
+      }
+    };
+    fetchProtocols();
+  }, [setProtocols]);
+
+  const copyProtocolUrl = async (protocol: {name: string; url: string | null}) => {
+    if (!protocol.url) return;
+    try {
+      await navigator.clipboard.writeText(protocol.url);
+      setCopiedProtocol(protocol.name);
+      setTimeout(() => setCopiedProtocol(null), 2000);
+    } catch (e) {
+      console.error('Failed to copy:', e);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }} onClick={onClose}>
+      <div className="card animate-fadeIn modal-content" style={{ padding: "24px", width: "100%", maxWidth: "520px" }} onClick={(e) => e.stopPropagation()}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <FileJson style={{ width: "18px", height: "18px", color: "#F0B90B" }} />
+            </div>
+            <h2 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>Выберите протокол</h2>
+          </div>
+          <button onClick={onClose} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
+            <X style={{ width: "20px", height: "20px", color: "#6B7280" }} />
+          </button>
+        </div>
+
+        <div style={{ background: "rgba(107, 114, 128, 0.1)", borderRadius: "12px", padding: "14px", marginBottom: "20px", border: "1px solid rgba(107, 114, 128, 0.2)" }}>
+          <p style={{ color: "#9CA3AF", fontSize: "13px", margin: 0, lineHeight: "1.5" }}>
+            Скопируйте ссылку нужного протокола и вставьте в NekoBox через «Программа» → «Добавить профиль из буфера» (Ctrl+V)
+          </p>
+        </div>
+
+        {/* Protocol List */}
+        <div style={{ display: "grid", gap: "12px", marginBottom: "20px" }}>
+          {loadingProtocols ? (
+            <div style={{ textAlign: "center", padding: "24px" }}>
+              <Loader2 className="animate-spin" style={{ width: "24px", height: "24px", color: "#F0B90B", margin: "0 auto" }} />
+            </div>
+          ) : protocols.map((protocol) => {
+            const info = PROTOCOL_INFO[protocol.name] || { icon: '🔒', tip: protocol.description, color: '#6B7280' };
+            const isCopied = copiedProtocol === protocol.name;
+
+            return (
+              <div
+                key={protocol.name}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "14px 16px",
+                  borderRadius: "12px",
+                  border: protocol.configured ? `1px solid ${info.color}33` : "1px solid rgba(107, 114, 128, 0.2)",
+                  background: protocol.configured ? `${info.color}08` : "rgba(107, 114, 128, 0.05)",
+                  opacity: protocol.configured ? 1 : 0.5,
+                }}
+              >
+                <span style={{ fontSize: "20px" }}>{info.icon}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontWeight: 500, color: protocol.configured ? "#E5E7EB" : "#6B7280" }}>{protocol.name}</span>
+                    {!protocol.configured && (
+                      <span style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "4px", background: "rgba(107, 114, 128, 0.2)", color: "#6B7280" }}>
+                        Не настроен
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ fontSize: "12px", color: "#6B7280", margin: "4px 0 0", lineHeight: "1.4" }}>
+                    {info.tip}
+                  </p>
+                </div>
+                {protocol.configured && protocol.url && (
+                  <button
+                    onClick={() => copyProtocolUrl(protocol)}
+                    className="btn-secondary"
+                    style={{
+                      padding: "8px 14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      background: isCopied ? "rgba(16, 185, 129, 0.15)" : `${info.color}15`,
+                      borderColor: isCopied ? "rgba(16, 185, 129, 0.4)" : `${info.color}40`,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {isCopied ? (
+                      <>
+                        <Check style={{ width: "14px", height: "14px", color: "#10B981" }} />
+                        <span style={{ color: "#10B981", fontSize: "13px" }}>OK</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy style={{ width: "14px", height: "14px", color: info.color }} />
+                        <span style={{ color: info.color, fontSize: "13px" }}>Копировать</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* App Download Links */}
+        <details style={{ marginBottom: "20px" }}>
+          <summary style={{ fontSize: "14px", color: "#9CA3AF", cursor: "pointer", marginBottom: "12px", userSelect: "none" }}>
+            📱 Где скачать клиент?
+          </summary>
+          <div style={{ display: "grid", gap: "8px", marginTop: "12px" }}>
+            <a href="https://github.com/MatsuriDayo/nekoray/releases" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none" }} className="download-link">
+              <Monitor style={{ width: "18px", height: "18px", color: "#6B7280" }} />
+              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>NekoBox (Windows/Linux)</span>
+              <ExternalLink style={{ width: "14px", height: "14px", color: "#6B7280" }} />
+            </a>
+            <a href="https://apps.apple.com/app/sing-box/id6451272673" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none" }} className="download-link">
+              <Apple style={{ width: "18px", height: "18px", color: "#6B7280" }} />
+              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>SingBox (macOS/iOS)</span>
+              <ExternalLink style={{ width: "14px", height: "14px", color: "#6B7280" }} />
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=moe.nb4a" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none" }} className="download-link">
+              <Smartphone style={{ width: "18px", height: "18px", color: "#6B7280" }} />
+              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>NekoBox (Android)</span>
+              <ExternalLink style={{ width: "14px", height: "14px", color: "#6B7280" }} />
+            </a>
+          </div>
+        </details>
+
+        <div style={{ display: "flex", gap: "12px" }}>
+          <button onClick={onClose} className="btn-secondary" style={{ flex: 1 }}>
+            Закрыть
+          </button>
+          <button onClick={onDownloadSingBox} className="btn-gold" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+            <Download style={{ width: "16px", height: "16px" }} />
+            JSON (SingBox)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Social Links Component
 const SocialLinks = () => (
   <div className="social-links">
@@ -101,7 +293,8 @@ export default function HomePage() {
   const [qrModal, setQrModal] = useState<{ client: Client; qr: string } | null>(null);
   const [multiModal, setMultiModal] = useState<Client | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [copiedVless, setCopiedVless] = useState(false);
+  const [copiedProtocol, setCopiedProtocol] = useState<string | null>(null);
+  const [protocols, setProtocols] = useState<Array<{name: string; url: string | null; configured: boolean; description: string}>>([]);
   const [showSplash, setShowSplash] = useState(true);
   const [togglingAll, setTogglingAll] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -383,20 +576,6 @@ export default function HomePage() {
       URL.revokeObjectURL(url);
     } catch (e) {
       console.error("Failed to download SingBox config:", e);
-    }
-  };
-
-  const copyVlessUrl = async (client: Client) => {
-    try {
-      const res = await fetch("/api/vless-url?id=" + encodeURIComponent(client.id));
-      const data = await res.json();
-      if (data.url) {
-        await navigator.clipboard.writeText(data.url);
-        setCopiedVless(true);
-        setTimeout(() => setCopiedVless(false), 2000);
-      }
-    } catch (e) {
-      console.error("Failed to copy VLESS URL:", e);
     }
   };
 
@@ -697,82 +876,15 @@ export default function HomePage() {
       )}
 
       {multiModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }} onClick={() => setMultiModal(null)}>
-          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", width: "100%", maxWidth: "480px" }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <FileJson style={{ width: "18px", height: "18px", color: "#F0B90B" }} />
-                </div>
-                <h2 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>Multi-протокол конфиг</h2>
-              </div>
-              <button onClick={() => setMultiModal(null)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
-                <X style={{ width: "20px", height: "20px", color: "#6B7280" }} />
-              </button>
-            </div>
-
-            <div style={{ background: "rgba(240, 185, 11, 0.05)", borderRadius: "12px", padding: "16px", marginBottom: "20px", border: "1px solid rgba(240, 185, 11, 0.2)" }}>
-              <p style={{ color: "#9CA3AF", fontSize: "14px", margin: 0, lineHeight: "1.5" }}>
-                Этот конфиг включает несколько протоколов для максимальной защиты и обхода блокировок. Для его использования нужен специальный клиент.
-              </p>
-              <Link href="/guide" style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#F0B90B", fontSize: "14px", marginTop: "12px", textDecoration: "none" }}>
-                <BookOpen style={{ width: "16px", height: "16px" }} />
-                Подробные инструкции по настройке
-              </Link>
-            </div>
-
-            <p style={{ fontSize: "14px", color: "#9CA3AF", marginBottom: "12px" }}>Установите приложение:</p>
-
-            <div style={{ display: "grid", gap: "10px", marginBottom: "24px" }}>
-              <a href="https://github.com/MatsuriDayo/nekoray/releases" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none", transition: "all 0.2s" }} className="download-link">
-                <Monitor style={{ width: "20px", height: "20px", color: "#6B7280" }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 500, color: "#E5E7EB" }}>NekoBox</div>
-                  <div style={{ fontSize: "12px", color: "#6B7280" }}>Windows / Linux</div>
-                </div>
-                <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
-              </a>
-
-              <a href="https://apps.apple.com/app/sing-box/id6451272673" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none", transition: "all 0.2s" }} className="download-link">
-                <Apple style={{ width: "20px", height: "20px", color: "#6B7280" }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 500, color: "#E5E7EB" }}>SingBox</div>
-                  <div style={{ fontSize: "12px", color: "#6B7280" }}>macOS / iOS</div>
-                </div>
-                <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
-              </a>
-
-              <a href="https://play.google.com/store/apps/details?id=moe.nb4a" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none", transition: "all 0.2s" }} className="download-link">
-                <Smartphone style={{ width: "20px", height: "20px", color: "#6B7280" }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 500, color: "#E5E7EB" }}>NekoBox</div>
-                  <div style={{ fontSize: "12px", color: "#6B7280" }}>Android</div>
-                </div>
-                <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
-              </a>
-            </div>
-
-            <div style={{ background: "rgba(16, 185, 129, 0.05)", borderRadius: "12px", padding: "16px", marginBottom: "20px", border: "1px solid rgba(16, 185, 129, 0.2)" }}>
-              <p style={{ color: "#9CA3AF", fontSize: "13px", margin: "0 0 12px", lineHeight: "1.5" }}>
-                <strong style={{ color: "#10B981" }}>Для NekoBox/v2rayN:</strong> скопируйте ссылку и вставьте через «Программа» → «Добавить профиль из буфера обмена» (или Ctrl+V)
-              </p>
-              <button onClick={() => copyVlessUrl(multiModal)} className="btn-secondary" style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: copiedVless ? "rgba(16, 185, 129, 0.15)" : "rgba(16, 185, 129, 0.1)", borderColor: "rgba(16, 185, 129, 0.3)" }}>
-                {copiedVless ? <Check style={{ width: "16px", height: "16px", color: "#10B981" }} /> : <Link2 style={{ width: "16px", height: "16px", color: "#10B981" }} />}
-                <span style={{ color: "#10B981" }}>{copiedVless ? "Скопировано!" : "Скопировать VLESS ссылку"}</span>
-              </button>
-            </div>
-
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button onClick={() => setMultiModal(null)} className="btn-secondary" style={{ flex: 1 }}>
-                Закрыть
-              </button>
-              <button onClick={() => { downloadSingBoxConfig(multiModal); setMultiModal(null); }} className="btn-gold" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                <Download style={{ width: "16px", height: "16px" }} />
-                JSON (SingBox)
-              </button>
-            </div>
-          </div>
-        </div>
+        <MultiProtocolModal
+          client={multiModal}
+          protocols={protocols}
+          setProtocols={setProtocols}
+          copiedProtocol={copiedProtocol}
+          setCopiedProtocol={setCopiedProtocol}
+          onClose={() => setMultiModal(null)}
+          onDownloadSingBox={() => { downloadSingBoxConfig(multiModal); setMultiModal(null); }}
+        />
       )}
     </div>
   );
