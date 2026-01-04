@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 
+// UUIDs registered in 3x-ui panel
+const REGISTERED_UUIDS = [
+  '***REDACTED-UUID***',
+  '***REDACTED-UUID***',
+];
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -7,17 +13,11 @@ export async function GET(request: Request) {
 
     const SERVER_IP = process.env.WG_HOST || '91.184.250.14';
     const VLESS_PORT = process.env.VLESS_PORT || '8443';
-    const REALITY_PUBLIC_KEY = process.env.REALITY_PUBLIC_KEY || '';
-    const REALITY_SHORT_ID = process.env.REALITY_SHORT_ID || '';
+    const REALITY_PUBLIC_KEY = process.env.REALITY_PUBLIC_KEY || '1ULl7LzQbfyx6jS2VxwwAomvxr-_vOFcX-gqF-7DUTc';
+    const REALITY_SHORT_ID = process.env.REALITY_SHORT_ID || '6cf08f5fd8c7f7';
 
-    // Generate deterministic UUID from clientId
-    let hash = 0;
-    for (let i = 0; i < clientId.length; i++) {
-      hash = ((hash << 5) - hash) + clientId.charCodeAt(i);
-      hash = hash & hash;
-    }
-    const hex = Math.abs(hash).toString(16).padStart(8, '0');
-    const uuid = `${hex.slice(0, 8)}-${hex.slice(0, 4)}-4${hex.slice(1, 4)}-a${hex.slice(1, 4)}-${hex}${hex.slice(0, 4)}`;
+    // Use first registered UUID (all users share the same VLESS client for now)
+    const uuid = REGISTERED_UUIDS[0];
 
     // Build VLESS URL
     const vlessParams = new URLSearchParams({
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       type: 'tcp',
     });
 
-    const vlessUrl = `vless://${uuid}@${SERVER_IP}:${VLESS_PORT}?${vlessParams.toString()}#${encodeURIComponent(clientId)}`;
+    const vlessUrl = `vless://${uuid}@${SERVER_IP}:${VLESS_PORT}?${vlessParams.toString()}#BABLO-VPN`;
 
     return NextResponse.json({
       url: vlessUrl,
