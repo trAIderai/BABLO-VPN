@@ -350,6 +350,7 @@ export default function HomePage() {
       if (window.turnstile && turnstileContainerRef.current && !turnstileWidgetId.current) {
         try {
           setTurnstileStatus("rendering widget...");
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           turnstileWidgetId.current = window.turnstile.render(turnstileContainerRef.current, {
             sitekey: turnstileSiteKey,
             callback: (token: string) => {
@@ -358,7 +359,7 @@ export default function HomePage() {
             },
             "error-callback": () => setTurnstileStatus("WIDGET ERROR"),
             theme: "dark",
-          });
+          } as any);
           setTurnstileStatus("widget rendered, waiting...");
         } catch (err) {
           setTurnstileStatus("RENDER ERROR: " + String(err));
