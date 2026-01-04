@@ -43,10 +43,13 @@ fi
 # Открытие портов в firewall (если UFW активен)
 echo "[6/6] Настройка firewall..."
 if command -v ufw &> /dev/null; then
-    ufw allow 22/tcp
-    ufw allow 80/tcp
-    ufw allow 443/tcp
-    ufw allow 51820/udp
+    ufw allow 22/tcp      # SSH
+    ufw allow 80/tcp      # HTTP
+    ufw allow 443/tcp     # HTTPS
+    ufw allow 51820/udp   # WireGuard
+    ufw allow 2053/tcp    # 3x-ui Admin Panel
+    ufw allow 8443/tcp    # VLESS/Trojan
+    ufw allow 8443/udp    # Hysteria2
     echo "y" | ufw enable || true
 fi
 
@@ -54,8 +57,8 @@ fi
 echo "=========================================="
 echo "   Остановка старых контейнеров..."
 echo "=========================================="
-docker stop wg-easy caddy vpn-ui 2>/dev/null || true
-docker rm wg-easy caddy vpn-ui 2>/dev/null || true
+docker stop wg-easy caddy vpn-ui xray-ui 2>/dev/null || true
+docker rm wg-easy caddy vpn-ui xray-ui 2>/dev/null || true
 
 # Сборка и запуск контейнеров
 echo "=========================================="
@@ -75,11 +78,21 @@ echo "=========================================="
 echo ""
 docker compose ps
 echo ""
+echo "=========== WireGuard VPN =============="
 echo "Админ-панель: https://vpn.bablo.bot"
-echo "Пароль: ***REDACTED-PASSWORD***"
-echo ""
 echo "WireGuard порт: 51820/udp"
 echo ""
+echo "============= 3x-ui (Xray) ============="
+echo "Панель: http://91.184.250.14:2053"
+echo "Логин: admin"
+echo "Пароль: admin"
+echo "ВАЖНО: Сразу смените пароль!"
+echo ""
+echo "Протоколы:"
+echo "  VLESS/Trojan: порт 8443/tcp"
+echo "  Hysteria2: порт 8443/udp"
+echo ""
+echo "========================================="
 echo "Проверка статуса: cd /opt/bablo-vpn && docker compose ps"
 echo "Логи: cd /opt/bablo-vpn && docker compose logs -f"
 echo "=========================================="

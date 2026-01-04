@@ -52,7 +52,27 @@ services:
       - wg-easy
       - vpn-ui
 
+  # 3x-ui Panel (VLESS/Trojan/Hysteria)
+  xray-ui:
+    image: ghcr.io/mhsanaei/3x-ui:latest
+    container_name: xray-ui
+    hostname: xray-ui
+    environment:
+      - XRAY_VMESS_AEAD_FORCED=false
+      - XUI_ENABLE_FAIL2BAN=true
+    volumes:
+      - xray-ui-data:/etc/x-ui
+      - xray-ui-certs:/root/cert
+    ports:
+      - "2053:2053"     # Admin panel
+      - "8443:8443"     # VLESS/Trojan
+      - "8443:8443/udp" # Hysteria
+    restart: unless-stopped
+    tty: true
+
 volumes:
   wg-easy-data:
   caddy-data:
   caddy-config:
+  xray-ui-data:
+  xray-ui-certs:

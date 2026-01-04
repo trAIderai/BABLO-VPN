@@ -1,6 +1,15 @@
 # BABLO VPN
 
-WireGuard VPN management with custom UI in trAIder style.
+Multi-protocol VPN management with custom UI in trAIder style.
+
+## Supported Protocols
+
+| Protocol | Port | Best For |
+|----------|------|----------|
+| **WireGuard** | 51820/udp | Fast, stable VPN |
+| **VLESS** | 8443/tcp | Bypass DPI, stealth |
+| **Trojan** | 8443/tcp | Disguise as HTTPS |
+| **Hysteria2** | 8443/udp | Unstable networks |
 
 ## Features
 
@@ -11,6 +20,7 @@ WireGuard VPN management with custom UI in trAIder style.
 - Traffic statistics per client
 - Real-time online status
 - Automatic SSL via Caddy
+- **3x-ui panel** for VLESS/Trojan/Hysteria management
 
 ## Quick Install
 
@@ -28,12 +38,23 @@ docker compose up -d
 
 ## Access
 
-- **URL:** https://vpn.bablo.bot
-- **WireGuard Port:** 51820/udp
+| Service | URL/Port |
+|---------|----------|
+| **WireGuard UI** | https://vpn.bablo.bot |
+| **3x-ui Panel** | http://IP:2053 |
+| **WireGuard** | 51820/udp |
+| **VLESS/Trojan** | 8443/tcp |
+| **Hysteria2** | 8443/udp |
+
+### 3x-ui Default Credentials
+- **Login:** admin
+- **Password:** admin
+- **Change immediately after first login!**
 
 ## Stack
 
-- **VPN Backend:** [wg-easy](https://github.com/wg-easy/wg-easy)
+- **WireGuard Backend:** [wg-easy](https://github.com/wg-easy/wg-easy)
+- **Xray Backend:** [3x-ui](https://github.com/MHSanaei/3x-ui)
 - **Frontend:** Next.js 14 + Tailwind CSS
 - **Reverse Proxy:** Caddy (auto SSL)
 
