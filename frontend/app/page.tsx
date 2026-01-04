@@ -302,7 +302,6 @@ export default function HomePage() {
   // Turnstile state
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileStatus, setTurnstileStatus] = useState<string>("loading");
   const turnstileWidgetId = useRef<string | null>(null);
   const turnstileContainerRef = useRef<HTMLDivElement>(null);
 
@@ -315,28 +314,21 @@ export default function HomePage() {
   useEffect(() => {
     const loadTurnstile = async () => {
       try {
-        setTurnstileStatus("fetching config...");
         const res = await fetch("/api/config");
         const config = await res.json();
         if (config.turnstileSiteKey) {
           setTurnstileSiteKey(config.turnstileSiteKey);
-          setTurnstileStatus("loading script...");
           // Load Turnstile script
           if (!document.getElementById("turnstile-script")) {
             const script = document.createElement("script");
             script.id = "turnstile-script";
             script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
             script.async = true;
-            script.onload = () => setTurnstileStatus("script loaded, rendering...");
-            script.onerror = () => setTurnstileStatus("SCRIPT LOAD ERROR");
             document.head.appendChild(script);
           }
-        } else {
-          setTurnstileStatus("no captcha configured");
         }
       } catch (e) {
         console.error("Failed to load config:", e);
-        setTurnstileStatus("config fetch error");
       }
     };
     loadTurnstile();
@@ -344,54 +336,29 @@ export default function HomePage() {
 
   // Render Turnstile widget when ready
   useEffect(() => {
-    if (!turnstileSiteKey) {
-      return;
-    }
-    if (session?.authenticated) {
-      return;
-    }
+    if (!turnstileSiteKey || session?.authenticated) return;
 
     const renderWidget = () => {
       const container = turnstileContainerRef.current;
-      if (!container) {
-        setTurnstileStatus("ERROR: no container ref");
-        return;
-      }
-      if (!window.turnstile) {
-        setTurnstileStatus("waiting for turnstile...");
-        return;
-      }
-      if (turnstileWidgetId.current) {
-        return; // already rendered
-      }
+      if (!container || !window.turnstile || turnstileWidgetId.current) return;
 
       try {
-        setTurnstileStatus("calling render()...");
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         turnstileWidgetId.current = window.turnstile.render(container, {
           sitekey: turnstileSiteKey,
-          callback: (token: string) => {
-            setTurnstileToken(token);
-            setTurnstileStatus("verified!");
-          },
-          "error-callback": () => setTurnstileStatus("WIDGET ERROR"),
+          callback: (token: string) => setTurnstileToken(token),
           theme: "dark",
-        } as any);
-        setTurnstileStatus("render() done, widgetId=" + turnstileWidgetId.current);
+        });
       } catch (err) {
-        setTurnstileStatus("RENDER ERROR: " + String(err));
+        console.error("Turnstile render error:", err);
       }
     };
 
-    // Try immediately
+    // Try immediately and poll until ready
     renderWidget();
-
-    // Also poll in case script loads later
     const interval = setInterval(() => {
-      if (window.turnstile && !turnstileWidgetId.current) {
+      if (!turnstileWidgetId.current) {
         renderWidget();
-      }
-      if (turnstileWidgetId.current) {
+      } else {
         clearInterval(interval);
       }
     }, 200);
@@ -672,12 +639,7 @@ export default function HomePage() {
               </button>
             </div>
             {turnstileSiteKey && (
-              <div style={{ marginTop: "16px" }}>
-                <div ref={turnstileContainerRef} style={{ display: "flex", justifyContent: "center", minHeight: "65px" }} />
-                <p style={{ color: "#6B7280", fontSize: "11px", textAlign: "center", marginTop: "8px" }}>
-                  [{turnstileStatus}]
-                </p>
-              </div>
+              <div ref={turnstileContainerRef} style={{ marginTop: "16px", display: "flex", justifyContent: "center", minHeight: "65px" }} />
             )}
             {error && <p style={{ color: "#EF4444", fontSize: "14px", marginTop: "12px", textAlign: "center" }}>{error}</p>}
             <button type="submit" className="btn-gold" style={{ width: "100%", marginTop: "16px" }} disabled={loading}>
