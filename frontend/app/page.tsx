@@ -26,6 +26,10 @@ import {
   EyeOff,
   Zap,
   FileJson,
+  ExternalLink,
+  Smartphone,
+  Monitor,
+  Apple,
 } from "lucide-react";
 import QRCode from "qrcode";
 
@@ -92,6 +96,7 @@ export default function HomePage() {
   const [protectionType, setProtectionType] = useState<ProtectionType>('standard');
   const [adding, setAdding] = useState(false);
   const [qrModal, setQrModal] = useState<{ client: Client; qr: string } | null>(null);
+  const [multiModal, setMultiModal] = useState<Client | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showSplash, setShowSplash] = useState(true);
   const [togglingAll, setTogglingAll] = useState(false);
@@ -582,7 +587,7 @@ export default function HomePage() {
                   WG
                 </button>
                 {isAdvancedClient(client) && (
-                  <button onClick={() => downloadSingBoxConfig(client)} className="btn-secondary" style={{ flex: 1, minWidth: "80px", padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px", background: "rgba(240, 185, 11, 0.1)", borderColor: "rgba(240, 185, 11, 0.3)" }}>
+                  <button onClick={() => setMultiModal(client)} className="btn-secondary" style={{ flex: 1, minWidth: "80px", padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px", background: "rgba(240, 185, 11, 0.1)", borderColor: "rgba(240, 185, 11, 0.3)" }}>
                     <FileJson style={{ width: "14px", height: "14px", color: "#F0B90B" }} />
                     <span style={{ color: "#F0B90B" }}>Multi</span>
                   </button>
@@ -669,6 +674,71 @@ export default function HomePage() {
             <img src={qrModal.qr} alt="QR Code" style={{ borderRadius: "12px", maxWidth: "100%" }} />
             <p style={{ color: "#6B7280", fontSize: "14px", marginTop: "16px" }}>Scan with WireGuard app</p>
             <button onClick={() => setQrModal(null)} className="btn-secondary" style={{ marginTop: "16px" }}>Close</button>
+          </div>
+        </div>
+      )}
+
+      {multiModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }} onClick={() => setMultiModal(null)}>
+          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", width: "100%", maxWidth: "480px" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "linear-gradient(135deg, rgba(240, 185, 11, 0.2) 0%, rgba(240, 185, 11, 0.1) 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <FileJson style={{ width: "18px", height: "18px", color: "#F0B90B" }} />
+                </div>
+                <h2 style={{ fontSize: "18px", fontWeight: 600, margin: 0 }}>Multi-протокол конфиг</h2>
+              </div>
+              <button onClick={() => setMultiModal(null)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
+                <X style={{ width: "20px", height: "20px", color: "#6B7280" }} />
+              </button>
+            </div>
+
+            <div style={{ background: "rgba(240, 185, 11, 0.05)", borderRadius: "12px", padding: "16px", marginBottom: "20px", border: "1px solid rgba(240, 185, 11, 0.2)" }}>
+              <p style={{ color: "#9CA3AF", fontSize: "14px", margin: 0, lineHeight: "1.5" }}>
+                Этот конфиг включает несколько протоколов для максимальной защиты и обхода блокировок. Для его использования нужен специальный клиент.
+              </p>
+            </div>
+
+            <p style={{ fontSize: "14px", color: "#9CA3AF", marginBottom: "12px" }}>Установите приложение:</p>
+
+            <div style={{ display: "grid", gap: "10px", marginBottom: "24px" }}>
+              <a href="https://github.com/MatsuriDayo/nekoray/releases" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none", transition: "all 0.2s" }} className="download-link">
+                <Monitor style={{ width: "20px", height: "20px", color: "#6B7280" }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 500, color: "#E5E7EB" }}>NekoBox</div>
+                  <div style={{ fontSize: "12px", color: "#6B7280" }}>Windows / Linux</div>
+                </div>
+                <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
+              </a>
+
+              <a href="https://apps.apple.com/app/sing-box/id6451272673" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none", transition: "all 0.2s" }} className="download-link">
+                <Apple style={{ width: "20px", height: "20px", color: "#6B7280" }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 500, color: "#E5E7EB" }}>SingBox</div>
+                  <div style={{ fontSize: "12px", color: "#6B7280" }}>macOS / iOS</div>
+                </div>
+                <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
+              </a>
+
+              <a href="https://play.google.com/store/apps/details?id=moe.nb4a" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "12px", padding: "12px 16px", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none", transition: "all 0.2s" }} className="download-link">
+                <Smartphone style={{ width: "20px", height: "20px", color: "#6B7280" }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 500, color: "#E5E7EB" }}>NekoBox</div>
+                  <div style={{ fontSize: "12px", color: "#6B7280" }}>Android</div>
+                </div>
+                <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
+              </a>
+            </div>
+
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button onClick={() => setMultiModal(null)} className="btn-secondary" style={{ flex: 1 }}>
+                Закрыть
+              </button>
+              <button onClick={() => { downloadSingBoxConfig(multiModal); setMultiModal(null); }} className="btn-gold" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                <Download style={{ width: "16px", height: "16px" }} />
+                Скачать конфиг
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -323,3 +323,10 @@ body {
   width: 20px;
   height: 20px;
 }
+
+/* Download links in multi modal */
+.download-link:hover {
+  background: rgba(240, 185, 11, 0.1) !important;
+  border-color: rgba(240, 185, 11, 0.3) !important;
+  transform: translateY(-1px);
+}
