@@ -388,7 +388,7 @@ export default function HomePage() {
 
   const copyVlessUrl = async (client: Client) => {
     try {
-      const res = await fetch("/api/vless/" + client.id);
+      const res = await fetch("/api/vless-url?id=" + encodeURIComponent(client.id));
       const data = await res.json();
       if (data.url) {
         await navigator.clipboard.writeText(data.url);

@@ -23,6 +23,9 @@ vpn.bablo.bot {
     handle /api/vless/* {
         reverse_proxy vpn-ui:3000
     }
+    handle /api/vless-url {
+        reverse_proxy vpn-ui:3000
+    }
     handle /api/singbox/* {
         reverse_proxy vpn-ui:3000
     }
