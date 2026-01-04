@@ -26,10 +26,12 @@ function generateVlessUrl(clientName: string, uuid: string): string {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { clientId: string } }
+  context: { params: { clientId: string } }
 ) {
   try {
-    const clientId = params.clientId;
+    console.log('VLESS API called, context:', JSON.stringify(context));
+    const clientId = context.params.clientId;
+    console.log('clientId:', clientId);
     const cookie = request.headers.get('cookie') || '';
 
     // Get client info
@@ -65,8 +67,12 @@ export async function GET(
     });
   } catch (error) {
     console.error('VLESS URL generation error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : '';
+    console.error('Error message:', errorMessage);
+    console.error('Error stack:', errorStack);
     return NextResponse.json(
-      { error: 'Failed to generate VLESS URL' },
+      { error: 'Failed to generate VLESS URL', message: errorMessage },
       { status: 500 }
     );
   }
