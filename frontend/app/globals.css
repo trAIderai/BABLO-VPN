@@ -189,14 +189,15 @@ body {
 
 /* Header buttons */
 .header-btn {
-  padding: 6px 10px;
+  padding: 8px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
 
 .header-btn-add {
-  padding: 8px 14px;
+  padding: 8px 12px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -215,15 +216,23 @@ body {
   }
 
   .header-btn {
-    padding: 5px 7px;
+    padding: 8px;
+    min-width: 36px;
+    min-height: 36px;
   }
 
   .header-btn-add {
-    padding: 6px 10px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .header-icon {
+    width: 16px;
+    height: 16px;
   }
 
   .header-actions {
-    gap: 4px !important;
+    gap: 6px !important;
   }
 
   /* Stats grid - 3 columns but compact on mobile */
