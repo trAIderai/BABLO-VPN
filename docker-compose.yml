@@ -14,6 +14,7 @@ services:
       - PORT=51821
       - UI_TRAFFIC_STATS=true
       - UI_CHART_TYPE=2
+      - WG_MTU=1280
     volumes:
       - wg-easy-data:/etc/wireguard
     ports:
