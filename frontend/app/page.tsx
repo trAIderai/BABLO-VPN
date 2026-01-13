@@ -869,11 +869,26 @@ export default function HomePage() {
 
       {qrModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0, 0, 0, 0.7)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: "16px" }} onClick={() => setQrModal(null)}>
-          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", textAlign: "center" }} onClick={(e) => e.stopPropagation()}>
+          <div className="card animate-fadeIn modal-content" style={{ padding: "24px", textAlign: "center", maxWidth: "360px" }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px" }}>{qrModal.client.name}</h2>
             <img src={qrModal.qr} alt="QR Code" style={{ borderRadius: "12px", maxWidth: "100%" }} />
-            <p style={{ color: "#6B7280", fontSize: "14px", marginTop: "16px" }}>Scan with WireGuard app</p>
-            <button onClick={() => setQrModal(null)} className="btn-secondary" style={{ marginTop: "16px" }}>Close</button>
+            <p style={{ color: "#6B7280", fontSize: "14px", marginTop: "16px" }}>Отсканируйте QR-код в приложении WireGuard</p>
+            <div style={{ borderTop: "1px solid #374151", margin: "16px 0", paddingTop: "16px" }}>
+              <p style={{ color: "#9CA3AF", fontSize: "13px", marginBottom: "12px" }}>Или скачайте файл конфигурации и отправьте его через мессенджер</p>
+              <button
+                onClick={() => downloadConfig(qrModal.client)}
+                className="btn-primary"
+                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Скачать .conf файл
+              </button>
+            </div>
+            <button onClick={() => setQrModal(null)} className="btn-secondary" style={{ marginTop: "8px", width: "100%" }}>Закрыть</button>
           </div>
         </div>
       )}
