@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const ADGUARD_URL = "http://wg-easy:8080";
+const ADGUARD_URL = process.env.ADGUARD_URL || "http://host.docker.internal:8053";
 const ADGUARD_USER = process.env.ADGUARD_USER || "admin";
 const ADGUARD_PASS = process.env.ADGUARD_PASS || "";
 

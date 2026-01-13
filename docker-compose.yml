@@ -63,6 +63,8 @@ services:
       # AdGuard Home
       - ADGUARD_USER=${ADGUARD_USER:-admin}
       - ADGUARD_PASS=${ADGUARD_PASS:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     depends_on:
       - wg-easy
