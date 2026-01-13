@@ -1,3 +1,8 @@
+# Mail server proxy
+mail.bablo.bot {
+    reverse_proxy host.docker.internal:8080
+}
+
 {$WG_HOST} {
     # Security headers
     header {

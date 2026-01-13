@@ -79,6 +79,8 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     depends_on:
       - wg-easy
