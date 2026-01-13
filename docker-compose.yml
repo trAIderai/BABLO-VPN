@@ -61,7 +61,8 @@ services:
       - HYSTERIA2_PORT=${HYSTERIA2_PORT:-8445}
       - HYSTERIA2_PASSWORD=${HYSTERIA2_PASSWORD}
       # AdGuard Home
-      - ADGUARD_URL=${ADGUARD_URL:-}
+      - ADGUARD_USER=${ADGUARD_USER:-admin}
+      - ADGUARD_PASS=${ADGUARD_PASS:-}
     restart: unless-stopped
     depends_on:
       - wg-easy

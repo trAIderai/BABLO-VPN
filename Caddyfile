@@ -40,6 +40,9 @@ mail.bablo.bot {
     handle /api/xray/* {
         reverse_proxy vpn-ui:3000
     }
+    handle /api/adguard {
+        reverse_proxy vpn-ui:3000
+    }
 
     # WireGuard API requests go to wg-easy
     handle /api/* {

@@ -28,6 +28,8 @@ import {
   Smartphone,
   Monitor,
   Apple,
+  Shield,
+  ShieldOff,
 } from "lucide-react";
 import { LogoB } from "./components/logos";
 import QRCode from "qrcode";
@@ -298,7 +300,11 @@ export default function HomePage() {
   const [showSplash, setShowSplash] = useState(true);
   const [togglingAll, setTogglingAll] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
+  // AdGuard state
+  const [adguardEnabled, setAdguardEnabled] = useState<boolean | null>(null);
+  const [togglingAdguard, setTogglingAdguard] = useState(false);
+
   // Turnstile state
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -439,6 +445,43 @@ export default function HomePage() {
     setRefreshing(true);
     await loadClients();
   };
+
+  // AdGuard functions
+  const loadAdguardStatus = async () => {
+    try {
+      const res = await fetch("/api/adguard");
+      if (res.ok) {
+        const data = await res.json();
+        setAdguardEnabled(data.enabled);
+      }
+    } catch (e) {
+      console.error("Failed to load AdGuard status:", e);
+    }
+  };
+
+  const toggleAdguard = async () => {
+    if (adguardEnabled === null) return;
+    setTogglingAdguard(true);
+    try {
+      const res = await fetch("/api/adguard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: !adguardEnabled }),
+      });
+      if (res.ok) {
+        setAdguardEnabled(!adguardEnabled);
+      }
+    } catch (e) {
+      console.error("Failed to toggle AdGuard:", e);
+    } finally {
+      setTogglingAdguard(false);
+    }
+  };
+
+  // Load AdGuard status on mount
+  useEffect(() => {
+    loadAdguardStatus();
+  }, []);
 
   const addClient = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -710,6 +753,30 @@ export default function HomePage() {
             <button onClick={handleRefresh} className="btn-secondary" style={{ padding: "10px 16px" }} disabled={refreshing}>
               <RefreshCw style={{ width: "18px", height: "18px" }} className={refreshing ? "animate-spin" : ""} />
             </button>
+            {adguardEnabled !== null && (
+              <button
+                onClick={toggleAdguard}
+                className="btn-secondary"
+                style={{
+                  padding: "10px 16px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  background: adguardEnabled ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
+                  borderColor: adguardEnabled ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"
+                }}
+                disabled={togglingAdguard}
+                title={adguardEnabled ? "AdGuard: Защита включена" : "AdGuard: Защита выключена"}
+              >
+                {togglingAdguard ? (
+                  <Loader2 className="animate-spin" style={{ width: "18px", height: "18px" }} />
+                ) : adguardEnabled ? (
+                  <Shield style={{ width: "18px", height: "18px", color: "#10B981" }} />
+                ) : (
+                  <ShieldOff style={{ width: "18px", height: "18px", color: "#EF4444" }} />
+                )}
+              </button>
+            )}
             <a
               href={`http://${typeof window !== 'undefined' ? window.location.hostname : ''}:8053`}
               target="_blank"
