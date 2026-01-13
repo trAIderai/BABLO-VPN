@@ -710,6 +710,17 @@ export default function HomePage() {
             <button onClick={handleRefresh} className="btn-secondary" style={{ padding: "10px 16px" }} disabled={refreshing}>
               <RefreshCw style={{ width: "18px", height: "18px" }} className={refreshing ? "animate-spin" : ""} />
             </button>
+            <a
+              href={`http://${typeof window !== 'undefined' ? window.location.hostname : ''}:8053`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary"
+              style={{ padding: "10px 16px", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
+              title="DNS логи (AdGuard Home)"
+            >
+              <Eye style={{ width: "18px", height: "18px" }} />
+              <span className="hide-mobile">DNS</span>
+            </a>
             <button onClick={() => setShowAddModal(true)} className="btn-gold" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <Plus style={{ width: "18px", height: "18px" }} />
               Добавить

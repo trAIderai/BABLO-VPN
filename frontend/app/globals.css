@@ -189,6 +189,10 @@ body {
 
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
   /* Stats grid - 3 columns but compact on mobile */
   .stats-grid {
     grid-template-columns: repeat(3, 1fr) !important;
