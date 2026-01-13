@@ -780,9 +780,9 @@ export default function HomePage() {
               <Eye className="header-icon" />
               <span className="hide-mobile">DNS</span>
             </a>
-            <button onClick={() => setShowAddModal(true)} className="btn-gold header-btn">
+            <button onClick={() => setShowAddModal(true)} className="btn-gold header-btn-add">
               <Plus className="header-icon" />
-              <span className="hide-mobile">Добавить</span>
+              Добавить
             </button>
           </div>
         </div>
