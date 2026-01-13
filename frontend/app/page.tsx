@@ -725,16 +725,12 @@ export default function HomePage() {
               <p style={{ color: "#6B7280", fontSize: "14px", margin: 0 }}>WireGuard Clients</p>
             </div>
           </div>
-          <div className="header-actions" style={{ display: "flex", gap: "12px" }}>
+          <div className="header-actions" style={{ display: "flex", gap: "8px" }}>
             {clients.length > 0 && (
               <button
                 onClick={toggleAllClients}
-                className="btn-secondary"
+                className="btn-secondary header-btn"
                 style={{
-                  padding: "10px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
                   background: allEnabled ? "rgba(16, 185, 129, 0.1)" : "rgba(107, 114, 128, 0.1)",
                   borderColor: allEnabled ? "rgba(16, 185, 129, 0.3)" : "rgba(107, 114, 128, 0.3)"
                 }}
@@ -742,26 +738,22 @@ export default function HomePage() {
                 title={allEnabled ? "Stop All" : "Start All"}
               >
                 {togglingAll ? (
-                  <Loader2 className="animate-spin" style={{ width: "18px", height: "18px" }} />
+                  <Loader2 className="animate-spin header-icon" />
                 ) : allEnabled ? (
-                  <Pause style={{ width: "18px", height: "18px", color: "#10B981" }} />
+                  <Pause className="header-icon" style={{ color: "#10B981" }} />
                 ) : (
-                  <Play style={{ width: "18px", height: "18px", color: "#6B7280" }} />
+                  <Play className="header-icon" style={{ color: "#6B7280" }} />
                 )}
               </button>
             )}
-            <button onClick={handleRefresh} className="btn-secondary" style={{ padding: "10px 16px" }} disabled={refreshing}>
-              <RefreshCw style={{ width: "18px", height: "18px" }} className={refreshing ? "animate-spin" : ""} />
+            <button onClick={handleRefresh} className="btn-secondary header-btn" disabled={refreshing}>
+              <RefreshCw className={`header-icon ${refreshing ? "animate-spin" : ""}`} />
             </button>
             {adguardEnabled !== null && (
               <button
                 onClick={toggleAdguard}
-                className="btn-secondary"
+                className="btn-secondary header-btn"
                 style={{
-                  padding: "10px 16px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
                   background: adguardEnabled ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)",
                   borderColor: adguardEnabled ? "rgba(16, 185, 129, 0.3)" : "rgba(239, 68, 68, 0.3)"
                 }}
@@ -769,11 +761,11 @@ export default function HomePage() {
                 title={adguardEnabled ? "AdGuard: Защита включена" : "AdGuard: Защита выключена"}
               >
                 {togglingAdguard ? (
-                  <Loader2 className="animate-spin" style={{ width: "18px", height: "18px" }} />
+                  <Loader2 className="animate-spin header-icon" />
                 ) : adguardEnabled ? (
-                  <Shield style={{ width: "18px", height: "18px", color: "#10B981" }} />
+                  <Shield className="header-icon" style={{ color: "#10B981" }} />
                 ) : (
-                  <ShieldOff style={{ width: "18px", height: "18px", color: "#EF4444" }} />
+                  <ShieldOff className="header-icon" style={{ color: "#EF4444" }} />
                 )}
               </button>
             )}
@@ -781,16 +773,16 @@ export default function HomePage() {
               href={`http://${typeof window !== 'undefined' ? window.location.hostname : ''}:8053`}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary"
-              style={{ padding: "10px 16px", display: "flex", alignItems: "center", gap: "8px", textDecoration: "none" }}
+              className="btn-secondary header-btn"
+              style={{ textDecoration: "none" }}
               title="DNS логи (AdGuard Home)"
             >
-              <Eye style={{ width: "18px", height: "18px" }} />
+              <Eye className="header-icon" />
               <span className="hide-mobile">DNS</span>
             </a>
-            <button onClick={() => setShowAddModal(true)} className="btn-gold" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <Plus style={{ width: "18px", height: "18px" }} />
-              Добавить
+            <button onClick={() => setShowAddModal(true)} className="btn-gold header-btn">
+              <Plus className="header-icon" />
+              <span className="hide-mobile">Добавить</span>
             </button>
           </div>
         </div>

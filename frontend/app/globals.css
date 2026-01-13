@@ -187,10 +187,37 @@ body {
   animation: shimmer 3s infinite;
 }
 
+/* Header buttons */
+.header-btn {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.header-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .hide-mobile {
     display: none !important;
+  }
+
+  .header-btn {
+    padding: 6px 8px;
+  }
+
+  .header-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .header-actions {
+    gap: 4px !important;
   }
 
   /* Stats grid - 3 columns but compact on mobile */
