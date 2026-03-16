@@ -67,9 +67,10 @@ function generateSingBoxConfig(
     default: outbounds.length > 0 ? outbounds[0].tag : 'direct',
   });
 
-  // Direct and block
+  // Direct, block, and dns
   outbounds.push({ type: 'direct', tag: 'direct' });
   outbounds.push({ type: 'block', tag: 'block' });
+  outbounds.push({ type: 'dns', tag: 'dns' });
 
   return {
     log: { level: 'info' },
@@ -86,7 +87,7 @@ function generateSingBoxConfig(
     route: {
       rules: [
         { protocol: 'dns', outbound: 'dns' },
-        { geoip: ['private'], outbound: 'direct' },
+        { ip_is_private: true, outbound: 'direct' },
       ],
       final: 'proxy',
     },
