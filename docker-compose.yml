@@ -105,9 +105,21 @@ services:
       - "2053:2053"     # Admin panel
       - "8443:8443"     # VLESS Reality
       - "8444:8444"     # Trojan Reality
-      - "8445:8445/udp" # Hysteria2
     restart: unless-stopped
     tty: true
+
+  # Hysteria2 - UDP-based protocol (bypasses TCP-focused DPI)
+  hysteria2:
+    image: tobyxdd/hysteria:v2
+    container_name: hysteria2
+    ports:
+      - "8445:8445/udp"
+    volumes:
+      - ./hysteria2/config.yaml:/etc/hysteria/config.yaml:ro
+      - ./hysteria2/cert.pem:/etc/hysteria/cert.pem:ro
+      - ./hysteria2/key.pem:/etc/hysteria/key.pem:ro
+    restart: unless-stopped
+    command: ["server", "-c", "/etc/hysteria/config.yaml"]
 
 volumes:
   wg-easy-data:

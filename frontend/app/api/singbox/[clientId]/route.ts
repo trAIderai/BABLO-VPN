@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 const WG_EASY_URL = 'http://wg-easy:51821';
 const SERVER_IP = process.env.WG_HOST || '';
 const VLESS_PORT = process.env.VLESS_PORT || '8443';
+const HYSTERIA2_PORT = process.env.HYSTERIA2_PORT || '8445';
+const HYSTERIA2_PASSWORD = process.env.HYSTERIA2_PASSWORD || '';
 
 interface SingBoxConfig {
   log: { level: string };
@@ -41,7 +43,23 @@ function generateSingBoxConfig(
     }
   }
 
-  // VLESS Reality outbound (if available)
+  // Hysteria2 outbound (UDP-based, bypasses TCP-focused DPI)
+  if (HYSTERIA2_PASSWORD) {
+    outbounds.push({
+      type: 'hysteria2',
+      tag: 'hysteria2',
+      server: SERVER_IP,
+      server_port: parseInt(HYSTERIA2_PORT),
+      password: HYSTERIA2_PASSWORD,
+      tls: {
+        enabled: true,
+        insecure: true,
+        server_name: 'www.bing.com',
+      },
+    });
+  }
+
+  // VLESS Reality gRPC outbound
   if (vlessUuid) {
     outbounds.push({
       type: 'vless',
@@ -49,7 +67,6 @@ function generateSingBoxConfig(
       server: SERVER_IP,
       server_port: parseInt(VLESS_PORT),
       uuid: vlessUuid,
-      flow: 'xtls-rprx-vision',
       tls: {
         enabled: true,
         server_name: 'www.google.com',
@@ -59,6 +76,10 @@ function generateSingBoxConfig(
           public_key: process.env.REALITY_PUBLIC_KEY || '',
           short_id: process.env.REALITY_SHORT_ID || '',
         },
+      },
+      transport: {
+        type: 'grpc',
+        service_name: 'bablo-grpc',
       },
     });
   }
