@@ -7,7 +7,7 @@ const VLESS_PORT = process.env.VLESS_PORT || '8443';
 interface SingBoxConfig {
   log: { level: string };
   dns: { servers: Array<{ tag: string; address: string; detour?: string }> };
-  inbounds: Array<{ type: string; tag: string; listen: string; listen_port?: number; sniff?: boolean }>;
+  inbounds: Array<any>;
   outbounds: Array<any>;
   route: { rules: Array<any>; final: string };
 }
@@ -59,18 +59,22 @@ function generateSingBoxConfig(
     });
   }
 
-  // Auto selector
-  outbounds.push({
-    type: 'selector',
-    tag: 'proxy',
-    outbounds: outbounds.map(o => o.tag).filter(t => t !== 'proxy'),
-    default: outbounds.length > 0 ? outbounds[0].tag : 'direct',
-  });
-
   // Direct, block, and dns
   outbounds.push({ type: 'direct', tag: 'direct' });
   outbounds.push({ type: 'block', tag: 'block' });
   outbounds.push({ type: 'dns', tag: 'dns' });
+
+  // Auto selector — include proxy outbounds + direct fallback
+  const proxyTags = outbounds
+    .filter(o => !['direct', 'block', 'dns'].includes(o.tag))
+    .map(o => o.tag);
+  const selectorOutbounds = proxyTags.length > 0 ? [...proxyTags, 'direct'] : ['direct'];
+  outbounds.unshift({
+    type: 'selector',
+    tag: 'proxy',
+    outbounds: selectorOutbounds,
+    default: selectorOutbounds[0],
+  });
 
   return {
     log: { level: 'info' },
@@ -81,7 +85,14 @@ function generateSingBoxConfig(
       ],
     },
     inbounds: [
-      { type: 'tun', tag: 'tun-in', listen: '::', sniff: true },
+      {
+        type: 'tun',
+        tag: 'tun-in',
+        address: ['172.19.0.1/30', 'fdfe:dcba:9876::1/126'],
+        auto_route: true,
+        stack: 'mixed',
+        sniff: true,
+      },
     ],
     outbounds,
     route: {
