@@ -157,24 +157,8 @@ export async function GET(
       console.error('WireGuard config fetch error:', e);
     }
 
-    // Get client info to find VLESS UUID (stored in client name as suffix)
-    let vlessUuid: string | null = null;
-    try {
-      const clientResponse = await fetch(
-        `${WG_EASY_URL}/api/wireguard/client`,
-        { headers: { Cookie: cookie } }
-      );
-      if (clientResponse.ok) {
-        const clients = await clientResponse.json();
-        const client = clients.find((c: any) => c.id === clientId);
-        // UUID stored in client metadata or generate from client ID
-        if (client?.vlessUuid) {
-          vlessUuid = client.vlessUuid;
-        }
-      }
-    } catch (e) {
-      console.error('Client info fetch error:', e);
-    }
+    // Use shared VLESS UUID from environment
+    const vlessUuid = process.env.VLESS_UUID || null;
 
     // Generate SingBox config
     const config = generateSingBoxConfig(
