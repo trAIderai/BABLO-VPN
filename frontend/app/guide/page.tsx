@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Shield,
   ChevronLeft,
   Monitor,
   Apple,
@@ -12,12 +11,7 @@ import {
   ChevronUp,
   ExternalLink,
   Download,
-  Settings,
-  Play,
-  Check,
   FileJson,
-  Import,
-  FolderOpen,
 } from "lucide-react";
 
 type Platform = "windows" | "macos" | "ios" | "android" | null;
@@ -148,7 +142,7 @@ export default function GuidePage() {
                   <div style={{ fontWeight: 600, color: "#E5E7EB", fontSize: "16px" }}>
                     Windows / Linux
                   </div>
-                  <div style={{ fontSize: "13px", color: "#6B7280" }}>NekoBox (nekoray)</div>
+                  <div style={{ fontSize: "13px", color: "#6B7280" }}>v2rayN</div>
                 </div>
               </div>
               {expandedPlatform === "windows" ? (
@@ -163,7 +157,7 @@ export default function GuidePage() {
                 <div style={{ paddingTop: "20px" }}>
                   {/* Download link */}
                   <a
-                    href="https://github.com/MatsuriDayo/nekoray/releases"
+                    href="https://github.com/2dust/v2rayN/releases"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="download-link"
@@ -181,9 +175,9 @@ export default function GuidePage() {
                   >
                     <Download style={{ width: "20px", height: "20px", color: "#3B82F6" }} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 500, color: "#E5E7EB" }}>Скачать NekoBox</div>
+                      <div style={{ fontWeight: 500, color: "#E5E7EB" }}>Скачать v2rayN</div>
                       <div style={{ fontSize: "12px", color: "#6B7280" }}>
-                        GitHub Releases → nekoray-*-windows64.zip
+                        GitHub Releases → v2rayN-windows-64.zip
                       </div>
                     </div>
                     <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
@@ -194,22 +188,22 @@ export default function GuidePage() {
                     <Step
                       number={1}
                       title="Установка"
-                      description="Скачайте архив nekoray-*-windows64.zip и распакуйте в удобную папку (например C:\Program Files\NekoBox). Запустите nekoray.exe"
+                      description="Скачайте архив v2rayN-windows-64.zip и распакуйте в удобную папку. Запустите v2rayN.exe"
                     />
                     <Step
                       number={2}
                       title="Импорт конфига"
-                      description='В главном окне нажмите "Программа" → "Добавить профиль из буфера обмена" или используйте Ctrl+V. Также можно перетащить JSON файл прямо в окно программы.'
+                      description='В главном окне нажмите "Серверы" → "Импорт из буфера обмена" или используйте Ctrl+V. Также можно перетащить JSON файл прямо в окно программы.'
                     />
                     <Step
                       number={3}
                       title="Выбор профиля"
-                      description="В списке профилей появится новый пункт. Кликните по нему правой кнопкой и выберите «Запустить» или просто дважды кликните."
+                      description="В списке серверов появится новый пункт. Кликните по нему правой кнопкой и выберите «Установить как активный сервер»."
                     />
                     <Step
                       number={4}
                       title="Подключение"
-                      description='Нажмите кнопку "Запустить" в нижней панели. Иконка в трее станет зелёной когда соединение установлено.'
+                      description='Нажмите кнопку включения в нижней панели. Иконка в трее изменит цвет когда соединение установлено.'
                     />
                   </div>
                 </div>
@@ -477,7 +471,7 @@ export default function GuidePage() {
               <div style={{ padding: "0 20px 20px", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
                 <div style={{ paddingTop: "20px" }}>
                   <a
-                    href="https://play.google.com/store/apps/details?id=moe.nb4a"
+                    href="https://github.com/MatsuriDayo/NekoBoxForAndroid/releases"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="download-link"
@@ -493,10 +487,10 @@ export default function GuidePage() {
                       marginBottom: "20px",
                     }}
                   >
-                    <Play style={{ width: "20px", height: "20px", color: "#10B981" }} />
+                    <Download style={{ width: "20px", height: "20px", color: "#10B981" }} />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 500, color: "#E5E7EB" }}>Скачать из Google Play</div>
-                      <div style={{ fontSize: "12px", color: "#6B7280" }}>NekoBox для Android</div>
+                      <div style={{ fontWeight: 500, color: "#E5E7EB" }}>Скачать с GitHub</div>
+                      <div style={{ fontSize: "12px", color: "#6B7280" }}>NekoBox APK → GitHub Releases</div>
                     </div>
                     <ExternalLink style={{ width: "16px", height: "16px", color: "#6B7280" }} />
                   </a>
@@ -505,7 +499,7 @@ export default function GuidePage() {
                     <Step
                       number={1}
                       title="Установка"
-                      description="Установите NekoBox из Google Play или скачайте APK с GitHub (github.com/MatsuriDayo/NekoBoxForAndroid)."
+                      description="Скачайте APK файл последней версии с GitHub. Откройте файл и разрешите установку из неизвестных источников если потребуется."
                     />
                     <Step
                       number={2}
