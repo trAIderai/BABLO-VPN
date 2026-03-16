@@ -80,9 +80,14 @@ function generateSingBoxConfig(
     log: { level: 'info' },
     dns: {
       servers: [
-        { tag: 'google', address: 'https://8.8.8.8/dns-query', detour: 'proxy' },
-        { tag: 'local', address: '223.5.5.5' },
+        { tag: 'remote', address: 'https://8.8.8.8/dns-query', detour: 'proxy' },
+        { tag: 'local', address: 'https://1.1.1.1/dns-query', detour: 'direct' },
       ],
+      rules: [
+        { outbound: 'any', server: 'local' },
+      ],
+      final: 'remote',
+      strategy: 'prefer_ipv4',
     },
     inbounds: [
       {
