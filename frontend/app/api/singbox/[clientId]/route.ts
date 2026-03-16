@@ -24,7 +24,7 @@ function generateSingBoxConfig(
   if (wgConfig) {
     const wgParsed = parseWireGuardConfig(wgConfig);
     if (wgParsed) {
-      outbounds.push({
+      const wgOutbound: any = {
         type: 'wireguard',
         tag: 'wireguard',
         server: wgParsed.endpoint.split(':')[0],
@@ -33,7 +33,11 @@ function generateSingBoxConfig(
         private_key: wgParsed.privateKey,
         peer_public_key: wgParsed.peerPublicKey,
         mtu: 1280,
-      });
+      };
+      if (wgParsed.preSharedKey) {
+        wgOutbound.pre_shared_key = wgParsed.preSharedKey;
+      }
+      outbounds.push(wgOutbound);
     }
   }
 
@@ -59,14 +63,12 @@ function generateSingBoxConfig(
     });
   }
 
-  // Direct, block, and dns
+  // Direct outbound (block and dns handled via route actions in 1.11+)
   outbounds.push({ type: 'direct', tag: 'direct' });
-  outbounds.push({ type: 'block', tag: 'block' });
-  outbounds.push({ type: 'dns', tag: 'dns' });
 
   // Auto selector — include proxy outbounds + direct fallback
   const proxyTags = outbounds
-    .filter(o => !['direct', 'block', 'dns'].includes(o.tag))
+    .filter(o => !['direct'].includes(o.tag))
     .map(o => o.tag);
   const selectorOutbounds = proxyTags.length > 0 ? [...proxyTags, 'direct'] : ['direct'];
   outbounds.unshift({
@@ -102,7 +104,7 @@ function generateSingBoxConfig(
     outbounds,
     route: {
       rules: [
-        { protocol: 'dns', outbound: 'dns' },
+        { protocol: 'dns', action: 'hijack-dns' },
         { ip_is_private: true, outbound: 'direct' },
       ],
       final: 'proxy',
@@ -114,16 +116,18 @@ function parseWireGuardConfig(config: string): {
   privateKey: string;
   address: string;
   peerPublicKey: string;
+  preSharedKey: string;
   endpoint: string;
 } | null {
   try {
     const privateKey = config.match(/PrivateKey\s*=\s*(\S+)/)?.[1] || '';
     const address = config.match(/Address\s*=\s*(\S+)/)?.[1] || '';
     const peerPublicKey = config.match(/PublicKey\s*=\s*(\S+)/)?.[1] || '';
+    const preSharedKey = config.match(/PresharedKey\s*=\s*(\S+)/)?.[1] || '';
     const endpoint = config.match(/Endpoint\s*=\s*(\S+)/)?.[1] || '';
 
     if (privateKey && address && peerPublicKey && endpoint) {
-      return { privateKey, address, peerPublicKey, endpoint };
+      return { privateKey, address, peerPublicKey, preSharedKey, endpoint };
     }
     return null;
   } catch {
