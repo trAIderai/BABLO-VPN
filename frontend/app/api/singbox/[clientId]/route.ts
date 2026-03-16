@@ -6,7 +6,7 @@ const VLESS_PORT = process.env.VLESS_PORT || '8443';
 
 interface SingBoxConfig {
   log: { level: string };
-  dns: { servers: Array<{ tag: string; address: string; detour?: string }> };
+  dns: any;
   inbounds: Array<any>;
   outbounds: Array<any>;
   route: { rules: Array<any>; final: string };
