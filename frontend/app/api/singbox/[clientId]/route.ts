@@ -22,44 +22,7 @@ function generateSingBoxConfig(
 ): SingBoxConfig {
   const outbounds: any[] = [];
 
-  // WireGuard outbound (if available)
-  if (wgConfig) {
-    const wgParsed = parseWireGuardConfig(wgConfig);
-    if (wgParsed) {
-      const wgOutbound: any = {
-        type: 'wireguard',
-        tag: 'wireguard',
-        server: wgParsed.endpoint.split(':')[0],
-        server_port: parseInt(wgParsed.endpoint.split(':')[1]) || 51820,
-        local_address: [wgParsed.address],
-        private_key: wgParsed.privateKey,
-        peer_public_key: wgParsed.peerPublicKey,
-        mtu: 1280,
-      };
-      if (wgParsed.preSharedKey) {
-        wgOutbound.pre_shared_key = wgParsed.preSharedKey;
-      }
-      outbounds.push(wgOutbound);
-    }
-  }
-
-  // Hysteria2 outbound (UDP-based, bypasses TCP-focused DPI)
-  if (HYSTERIA2_PASSWORD) {
-    outbounds.push({
-      type: 'hysteria2',
-      tag: 'hysteria2',
-      server: SERVER_IP,
-      server_port: parseInt(HYSTERIA2_PORT),
-      password: HYSTERIA2_PASSWORD,
-      tls: {
-        enabled: true,
-        insecure: true,
-        server_name: 'www.bing.com',
-      },
-    });
-  }
-
-  // VLESS Reality gRPC outbound
+  // VLESS Reality gRPC outbound (primary — gRPC over H2 defeats Russia DPI threshold)
   if (vlessUuid) {
     outbounds.push({
       type: 'vless',
@@ -82,6 +45,43 @@ function generateSingBoxConfig(
         service_name: 'bablo-grpc',
       },
     });
+  }
+
+  // Hysteria2 outbound (fallback — QUIC/UDP, works outside Russia)
+  if (HYSTERIA2_PASSWORD) {
+    outbounds.push({
+      type: 'hysteria2',
+      tag: 'hysteria2',
+      server: SERVER_IP,
+      server_port: parseInt(HYSTERIA2_PORT),
+      password: HYSTERIA2_PASSWORD,
+      tls: {
+        enabled: true,
+        insecure: true,
+        server_name: 'www.bing.com',
+      },
+    });
+  }
+
+  // WireGuard outbound (fallback — blocked in Russia, works elsewhere)
+  if (wgConfig) {
+    const wgParsed = parseWireGuardConfig(wgConfig);
+    if (wgParsed) {
+      const wgOutbound: any = {
+        type: 'wireguard',
+        tag: 'wireguard',
+        server: wgParsed.endpoint.split(':')[0],
+        server_port: parseInt(wgParsed.endpoint.split(':')[1]) || 51820,
+        local_address: [wgParsed.address],
+        private_key: wgParsed.privateKey,
+        peer_public_key: wgParsed.peerPublicKey,
+        mtu: 1280,
+      };
+      if (wgParsed.preSharedKey) {
+        wgOutbound.pre_shared_key = wgParsed.preSharedKey;
+      }
+      outbounds.push(wgOutbound);
+    }
   }
 
   // Direct outbound (block and dns handled via route actions in 1.11+)
