@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const WG_EASY_URL = 'http://wg-easy:51821';
 const SERVER_IP = process.env.WG_HOST || '';
 const VLESS_PORT = process.env.VLESS_PORT || '8443';
 const HYSTERIA2_PORT = process.env.HYSTERIA2_PORT || '8445';
@@ -15,9 +14,10 @@ interface SingBoxConfig {
 }
 
 // Generate SingBox config with multiple protocols
+// Note: AmneziaWG is NOT included here — sing-box doesn't support AmneziaWG obfuscation.
+// AmneziaWG clients use the native AmneziaVPN app with .conf files instead.
 function generateSingBoxConfig(
   clientName: string,
-  wgConfig: string | null,
   vlessUuid: string | null
 ): SingBoxConfig {
   const outbounds: any[] = [];
@@ -47,7 +47,7 @@ function generateSingBoxConfig(
     });
   }
 
-  // Hysteria2 outbound (fallback — QUIC/UDP, works outside Russia)
+  // Hysteria2 outbound (fallback — QUIC/UDP)
   if (HYSTERIA2_PASSWORD) {
     outbounds.push({
       type: 'hysteria2',
@@ -61,27 +61,6 @@ function generateSingBoxConfig(
         server_name: 'www.bing.com',
       },
     });
-  }
-
-  // WireGuard outbound (fallback — blocked in Russia, works elsewhere)
-  if (wgConfig) {
-    const wgParsed = parseWireGuardConfig(wgConfig);
-    if (wgParsed) {
-      const wgOutbound: any = {
-        type: 'wireguard',
-        tag: 'wireguard',
-        server: wgParsed.endpoint.split(':')[0],
-        server_port: parseInt(wgParsed.endpoint.split(':')[1]) || 51820,
-        local_address: [wgParsed.address],
-        private_key: wgParsed.privateKey,
-        peer_public_key: wgParsed.peerPublicKey,
-        mtu: 1280,
-      };
-      if (wgParsed.preSharedKey) {
-        wgOutbound.pre_shared_key = wgParsed.preSharedKey;
-      }
-      outbounds.push(wgOutbound);
-    }
   }
 
   // Direct outbound (block and dns handled via route actions in 1.11+)
@@ -133,58 +112,19 @@ function generateSingBoxConfig(
   };
 }
 
-function parseWireGuardConfig(config: string): {
-  privateKey: string;
-  address: string;
-  peerPublicKey: string;
-  preSharedKey: string;
-  endpoint: string;
-} | null {
-  try {
-    const privateKey = config.match(/PrivateKey\s*=\s*(\S+)/)?.[1] || '';
-    const address = config.match(/Address\s*=\s*(\S+)/)?.[1] || '';
-    const peerPublicKey = config.match(/PublicKey\s*=\s*(\S+)/)?.[1] || '';
-    const preSharedKey = config.match(/PresharedKey\s*=\s*(\S+)/)?.[1] || '';
-    const endpoint = config.match(/Endpoint\s*=\s*(\S+)/)?.[1] || '';
-
-    if (privateKey && address && peerPublicKey && endpoint) {
-      return { privateKey, address, peerPublicKey, preSharedKey, endpoint };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 export async function GET(
   request: NextRequest,
   { params }: { params: { clientId: string } }
 ) {
   try {
     const clientId = params.clientId;
-    const cookie = request.headers.get('cookie') || '';
-
-    // Get WireGuard config
-    let wgConfig: string | null = null;
-    try {
-      const wgResponse = await fetch(
-        `${WG_EASY_URL}/api/wireguard/client/${clientId}/configuration`,
-        { headers: { Cookie: cookie } }
-      );
-      if (wgResponse.ok) {
-        wgConfig = await wgResponse.text();
-      }
-    } catch (e) {
-      console.error('WireGuard config fetch error:', e);
-    }
 
     // Use shared VLESS UUID from environment
     const vlessUuid = process.env.VLESS_UUID || null;
 
-    // Generate SingBox config
+    // Generate SingBox config (VLESS Reality + Hysteria2, no WireGuard — use AmneziaVPN app for AmneziaWG)
     const config = generateSingBoxConfig(
       clientId,
-      wgConfig,
       vlessUuid
     );
 

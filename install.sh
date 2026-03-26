@@ -6,6 +6,7 @@ set -e
 
 echo "=========================================="
 echo "   BABLO VPN - Installation"
+echo "   AmneziaWG + VLESS Reality + Hysteria2"
 echo "=========================================="
 
 # Check if running as root
@@ -63,9 +64,36 @@ fi
 
 # Generate password hash
 echo "[6/7] Configuring environment..."
-PASSWORD_HASH=$(docker run --rm ghcr.io/wg-easy/wg-easy:14 wgpw "$ADMIN_PASSWORD" 2>/dev/null | tail -1)
+PASSWORD_HASH=$(docker run --rm ghcr.io/spcfox/amnezia-wg-easy wgpw "$ADMIN_PASSWORD" 2>/dev/null | tail -1)
 # Escape $ for docker-compose
 PASSWORD_HASH_ESCAPED=$(echo "$PASSWORD_HASH" | sed 's/\$/\$\$/g')
+
+# Generate unique random AmneziaWG magic headers (H1-H4)
+generate_unique_h() {
+    local h1 h2 h3 h4
+    h1=$((RANDOM * RANDOM % 2000000000 + 1000000))
+    h2=$((RANDOM * RANDOM % 2000000000 + 1000000))
+    while [ "$h2" -eq "$h1" ]; do
+        h2=$((RANDOM * RANDOM % 2000000000 + 1000000))
+    done
+    h3=$((RANDOM * RANDOM % 2000000000 + 1000000))
+    while [ "$h3" -eq "$h1" ] || [ "$h3" -eq "$h2" ]; do
+        h3=$((RANDOM * RANDOM % 2000000000 + 1000000))
+    done
+    h4=$((RANDOM * RANDOM % 2000000000 + 1000000))
+    while [ "$h4" -eq "$h1" ] || [ "$h4" -eq "$h2" ] || [ "$h4" -eq "$h3" ]; do
+        h4=$((RANDOM * RANDOM % 2000000000 + 1000000))
+    done
+    echo "$h1 $h2 $h3 $h4"
+}
+
+AMNEZIA_HEADERS=$(generate_unique_h)
+AMNEZIA_H1=$(echo "$AMNEZIA_HEADERS" | awk '{print $1}')
+AMNEZIA_H2=$(echo "$AMNEZIA_HEADERS" | awk '{print $2}')
+AMNEZIA_H3=$(echo "$AMNEZIA_HEADERS" | awk '{print $3}')
+AMNEZIA_H4=$(echo "$AMNEZIA_HEADERS" | awk '{print $4}')
+
+echo "Generated AmneziaWG magic headers: H1=$AMNEZIA_H1 H2=$AMNEZIA_H2 H3=$AMNEZIA_H3 H4=$AMNEZIA_H4"
 
 # Create .env file
 cat > /opt/bablo-vpn/.env << EOF
@@ -74,6 +102,17 @@ cat > /opt/bablo-vpn/.env << EOF
 
 WG_HOST=$DOMAIN
 PASSWORD_HASH=$PASSWORD_HASH_ESCAPED
+
+# AmneziaWG Obfuscation (bypass Russia DPI/TSPU)
+AMNEZIA_JC=5
+AMNEZIA_JMIN=50
+AMNEZIA_JMAX=1000
+AMNEZIA_S1=75
+AMNEZIA_S2=75
+AMNEZIA_H1=$AMNEZIA_H1
+AMNEZIA_H2=$AMNEZIA_H2
+AMNEZIA_H3=$AMNEZIA_H3
+AMNEZIA_H4=$AMNEZIA_H4
 
 # Optional: Cloudflare Turnstile (leave empty to disable CAPTCHA)
 TURNSTILE_SITE_KEY=
@@ -129,9 +168,10 @@ echo "=========================================="
 echo ""
 docker compose ps
 echo ""
-echo "=========== WireGuard VPN =============="
+echo "=========== AmneziaWG VPN =============="
 echo "Admin panel: https://$DOMAIN"
-echo "WireGuard port: 51820/udp"
+echo "AmneziaWG port: 51820/udp (obfuscated)"
+echo "Client app: AmneziaVPN (iOS/Android/Desktop)"
 echo ""
 echo "============ AdGuard Home =============="
 echo "DNS: Active (port 53 via WireGuard)"
@@ -149,11 +189,17 @@ echo "  VLESS/Trojan: port 8443/tcp"
 echo "  Hysteria2: port 8445/udp"
 echo ""
 echo "=========== NEXT STEPS ================="
-echo "1. Open 3x-ui panel: http://$SERVER_IP:2053"
-echo "2. Create VLESS Reality inbound on port 8443"
-echo "3. Copy UUID, Public Key, Short ID to .env:"
-echo "   nano /opt/bablo-vpn/.env"
-echo "4. Restart: docker compose up -d"
+echo "1. Download AmneziaVPN app:"
+echo "   iOS: https://apps.apple.com/app/amneziavpn/id1600529900"
+echo "   Android: https://play.google.com/store/apps/details?id=org.amnezia.vpn"
+echo "2. Open admin panel: https://$DOMAIN"
+echo "3. Create client → download .conf or scan QR"
+echo "4. (Optional) Setup VLESS Reality for extra bypass:"
+echo "   - Open 3x-ui panel: http://$SERVER_IP:2053"
+echo "   - Create VLESS Reality inbound on port 8443"
+echo "   - Copy UUID, Public Key, Short ID to .env:"
+echo "     nano /opt/bablo-vpn/.env"
+echo "   - Restart: docker compose up -d"
 echo ""
 echo "========================================="
 echo "Status: cd /opt/bablo-vpn && docker compose ps"

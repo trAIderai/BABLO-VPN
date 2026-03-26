@@ -1,6 +1,6 @@
 services:
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:14
+    image: ghcr.io/spcfox/amnezia-wg-easy
     container_name: wg-easy
     environment:
       - LANG=ru
@@ -15,6 +15,16 @@ services:
       - UI_TRAFFIC_STATS=true
       - UI_CHART_TYPE=2
       - WG_MTU=1280
+      # AmneziaWG obfuscation parameters (bypass Russia DPI/TSPU)
+      - AMNEZIA_JC=${AMNEZIA_JC:-5}
+      - AMNEZIA_JMIN=${AMNEZIA_JMIN:-50}
+      - AMNEZIA_JMAX=${AMNEZIA_JMAX:-1000}
+      - AMNEZIA_S1=${AMNEZIA_S1:-75}
+      - AMNEZIA_S2=${AMNEZIA_S2:-75}
+      - AMNEZIA_H1=${AMNEZIA_H1}
+      - AMNEZIA_H2=${AMNEZIA_H2}
+      - AMNEZIA_H3=${AMNEZIA_H3}
+      - AMNEZIA_H4=${AMNEZIA_H4}
     volumes:
       - wg-easy-data:/etc/wireguard
     ports:

@@ -234,19 +234,24 @@ const MultiProtocolModal = ({
             📱 Где скачать клиент?
           </summary>
           <div style={{ display: "grid", gap: "8px", marginTop: "12px" }}>
+            <a href="https://apps.apple.com/app/amneziavpn/id1600529900" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(240,185,11,0.3)", background: "rgba(240,185,11,0.05)", textDecoration: "none" }} className="download-link">
+              <Apple style={{ width: "18px", height: "18px", color: "#F0B90B" }} />
+              <span style={{ flex: 1, color: "#E5E7EB", fontSize: "13px" }}>AmneziaVPN (iOS)</span>
+              <ExternalLink style={{ width: "14px", height: "14px", color: "#F0B90B" }} />
+            </a>
+            <a href="https://play.google.com/store/apps/details?id=org.amnezia.vpn" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(240,185,11,0.3)", background: "rgba(240,185,11,0.05)", textDecoration: "none" }} className="download-link">
+              <Smartphone style={{ width: "18px", height: "18px", color: "#F0B90B" }} />
+              <span style={{ flex: 1, color: "#E5E7EB", fontSize: "13px" }}>AmneziaVPN (Android)</span>
+              <ExternalLink style={{ width: "14px", height: "14px", color: "#F0B90B" }} />
+            </a>
+            <a href="https://github.com/amnezia-vpn/amnezia-client/releases" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none" }} className="download-link">
+              <Monitor style={{ width: "18px", height: "18px", color: "#6B7280" }} />
+              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>AmneziaVPN (Windows/macOS/Linux)</span>
+              <ExternalLink style={{ width: "14px", height: "14px", color: "#6B7280" }} />
+            </a>
             <a href="https://github.com/MatsuriDayo/nekoray/releases" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none" }} className="download-link">
               <Monitor style={{ width: "18px", height: "18px", color: "#6B7280" }} />
-              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>NekoBox (Windows/Linux)</span>
-              <ExternalLink style={{ width: "14px", height: "14px", color: "#6B7280" }} />
-            </a>
-            <a href="https://apps.apple.com/app/sing-box/id6451272673" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none" }} className="download-link">
-              <Apple style={{ width: "18px", height: "18px", color: "#6B7280" }} />
-              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>SingBox (macOS/iOS)</span>
-              <ExternalLink style={{ width: "14px", height: "14px", color: "#6B7280" }} />
-            </a>
-            <a href="https://play.google.com/store/apps/details?id=moe.nb4a" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.02)", textDecoration: "none" }} className="download-link">
-              <Smartphone style={{ width: "18px", height: "18px", color: "#6B7280" }} />
-              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>NekoBox (Android)</span>
+              <span style={{ flex: 1, color: "#9CA3AF", fontSize: "13px" }}>NekoBox (VLESS/Trojan/Hysteria2)</span>
               <ExternalLink style={{ width: "14px", height: "14px", color: "#6B7280" }} />
             </a>
           </div>
@@ -659,7 +664,7 @@ export default function HomePage() {
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at center, transparent 30%, rgba(8, 9, 11, 0.7) 70%)" }} />
         <div className="splash-text" style={{ position: "relative", zIndex: 10, textAlign: "center", marginTop: "60vh", opacity: 0 }}>
           <h1 className="font-bablo splash-title" style={{ fontSize: "4rem", color: "#F0B90B", letterSpacing: "0.15em", textShadow: "0 0 60px rgba(240, 185, 11, 0.6)", margin: 0 }}>BABLO VPN</h1>
-          <p style={{ color: "#6B7280", marginTop: "12px", fontSize: "14px", letterSpacing: "0.3em" }}>WIREGUARD MANAGEMENT</p>
+          <p style={{ color: "#6B7280", marginTop: "12px", fontSize: "14px", letterSpacing: "0.3em" }}>AMNEZIAWG VPN</p>
         </div>
         <div className="splash-shimmer" style={{ position: "absolute", bottom: "80px", width: "200px", height: "2px", borderRadius: "2px", zIndex: 10 }} />
       </div>
@@ -675,7 +680,7 @@ export default function HomePage() {
               <LogoB size={64} />
             </div>
             <h1 className="font-bablo" style={{ fontSize: "28px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
-            <p style={{ color: "#6B7280", marginTop: "8px" }}>WireGuard Management</p>
+            <p style={{ color: "#6B7280", marginTop: "8px" }}>AmneziaWG VPN</p>
           </div>
           <form onSubmit={login}>
             <div style={{ position: "relative" }}>
@@ -725,7 +730,7 @@ export default function HomePage() {
             <LogoB size={48} />
             <div>
               <h1 className="font-bablo" style={{ fontSize: "22px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
-              <p style={{ color: "#6B7280", fontSize: "14px", margin: 0 }}>WireGuard Clients</p>
+              <p style={{ color: "#6B7280", fontSize: "14px", margin: 0 }}>AmneziaWG Clients</p>
             </div>
           </div>
           <div className="header-actions" style={{ display: "flex", gap: "8px" }}>
@@ -857,7 +862,7 @@ export default function HomePage() {
               <div className="client-actions" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                 <button onClick={() => downloadConfig(client)} className="btn-secondary" style={{ flex: 1, minWidth: "80px", padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px" }}>
                   <Download style={{ width: "14px", height: "14px" }} />
-                  WG
+                  AWG
                 </button>
                 {isAdvancedClient(client) && (
                   <button onClick={() => setMultiModal(client)} className="btn-secondary" style={{ flex: 1, minWidth: "80px", padding: "8px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", fontSize: "13px", background: "rgba(240, 185, 11, 0.1)", borderColor: "rgba(240, 185, 11, 0.3)" }}>
@@ -908,7 +913,7 @@ export default function HomePage() {
                     <input type="radio" name="protectionType" checked={protectionType === 'standard'} onChange={() => setProtectionType('standard')} style={{ accentColor: "#F0B90B" }} />
                     <div>
                       <div style={{ fontWeight: 500, fontSize: "15px" }}>Стандартная защита</div>
-                      <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "2px" }}>Быстрое и стабильное соединение</div>
+                      <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "2px" }}>AmneziaWG — обход блокировок DPI</div>
                     </div>
                   </div>
                 </label>
@@ -918,7 +923,7 @@ export default function HomePage() {
                     <input type="radio" name="protectionType" checked={protectionType === 'advanced'} onChange={() => setProtectionType('advanced')} style={{ accentColor: "#F0B90B" }} />
                     <div>
                       <div style={{ fontWeight: 500, fontSize: "15px" }}>Продвинутая защита</div>
-                      <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "2px" }}>Обход блокировок + резервные протоколы</div>
+                      <div style={{ fontSize: "13px", color: "#6B7280", marginTop: "2px" }}>AmneziaWG + VLESS Reality + Hysteria2</div>
                     </div>
                   </div>
                 </label>
@@ -936,7 +941,7 @@ export default function HomePage() {
       )}
 
       <div className="footer" style={{ position: "fixed", bottom: "16px", left: "50%", transform: "translateX(-50%)", display: "flex", alignItems: "center", gap: "24px", fontSize: "12px", color: "#4B5563", zIndex: 1 }}>
-        <span>Powered by <a href="https://github.com/wg-easy/wg-easy" target="_blank" rel="noopener noreferrer" style={{ color: "#6B7280", textDecoration: "none" }}>wg-easy</a></span>
+        <span>Powered by <a href="https://github.com/spcfox/amnezia-wg-easy" target="_blank" rel="noopener noreferrer" style={{ color: "#6B7280", textDecoration: "none" }}>amnezia-wg-easy</a></span>
         <SocialLinks />
       </div>
 
@@ -945,9 +950,9 @@ export default function HomePage() {
           <div className="card animate-fadeIn modal-content" style={{ padding: "24px", textAlign: "center", maxWidth: "360px" }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "16px" }}>{qrModal.client.name}</h2>
             <img src={qrModal.qr} alt="QR Code" style={{ borderRadius: "12px", maxWidth: "100%" }} />
-            <p style={{ color: "#6B7280", fontSize: "14px", marginTop: "16px" }}>Отсканируйте QR-код в приложении WireGuard</p>
+            <p style={{ color: "#6B7280", fontSize: "14px", marginTop: "16px" }}>Отсканируйте QR-код в приложении AmneziaVPN</p>
             <div style={{ borderTop: "1px solid #374151", margin: "16px 0", paddingTop: "16px" }}>
-              <p style={{ color: "#9CA3AF", fontSize: "13px", marginBottom: "12px" }}>Или скачайте файл конфигурации и отправьте его через мессенджер</p>
+              <p style={{ color: "#9CA3AF", fontSize: "13px", marginBottom: "12px" }}>Или скачайте конфигурацию и откройте в AmneziaVPN</p>
               <button
                 onClick={() => downloadConfig(qrModal.client)}
                 className="btn-primary"
@@ -958,7 +963,7 @@ export default function HomePage() {
                   <polyline points="7 10 12 15 17 10"/>
                   <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
-                Скачать .conf файл
+                Скачать AmneziaWG .conf
               </button>
             </div>
             <button onClick={() => setQrModal(null)} className="btn-secondary" style={{ marginTop: "8px", width: "100%" }}>Закрыть</button>
