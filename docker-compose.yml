@@ -27,6 +27,7 @@ services:
       - H4=${AWG_H4}
     volumes:
       - wg-easy-data:/etc/wireguard
+      - wg-easy-data:/etc/amnezia/amneziawg
       - /usr/bin/awg:/usr/bin/wg:ro
       - /usr/bin/awg-quick:/usr/bin/wg-quick:ro
       - /lib/modules:/lib/modules:ro
