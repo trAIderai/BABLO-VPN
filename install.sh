@@ -87,13 +87,25 @@ generate_unique_h() {
     echo "$h1 $h2 $h3 $h4"
 }
 
-AMNEZIA_HEADERS=$(generate_unique_h)
-AMNEZIA_H1=$(echo "$AMNEZIA_HEADERS" | awk '{print $1}')
-AMNEZIA_H2=$(echo "$AMNEZIA_HEADERS" | awk '{print $2}')
-AMNEZIA_H3=$(echo "$AMNEZIA_HEADERS" | awk '{print $3}')
-AMNEZIA_H4=$(echo "$AMNEZIA_HEADERS" | awk '{print $4}')
+AWG_HEADERS=$(generate_unique_h)
+AWG_H1=$(echo "$AWG_HEADERS" | awk '{print $1}')
+AWG_H2=$(echo "$AWG_HEADERS" | awk '{print $2}')
+AWG_H3=$(echo "$AWG_HEADERS" | awk '{print $3}')
+AWG_H4=$(echo "$AWG_HEADERS" | awk '{print $4}')
 
-echo "Generated AmneziaWG magic headers: H1=$AMNEZIA_H1 H2=$AMNEZIA_H2 H3=$AMNEZIA_H3 H4=$AMNEZIA_H4"
+echo "Generated AmneziaWG magic headers: H1=$AWG_H1 H2=$AWG_H2 H3=$AWG_H3 H4=$AWG_H4"
+
+# Install AmneziaWG kernel module and tools
+echo "Installing AmneziaWG kernel module..."
+apt-get install -y -qq dkms linux-headers-$(uname -r) git
+cd /tmp && rm -rf amneziawg-linux-kernel-module amneziawg-tools
+git clone --quiet https://github.com/amnezia-vpn/amneziawg-linux-kernel-module.git
+cd amneziawg-linux-kernel-module/src && make && make install
+modprobe amneziawg
+echo "amneziawg" > /etc/modules-load.d/amneziawg.conf
+cd /tmp && git clone --quiet https://github.com/amnezia-vpn/amneziawg-tools.git
+cd amneziawg-tools/src && make && make install
+echo "AmneziaWG kernel module and tools installed."
 
 # Create .env file
 cat > /opt/bablo-vpn/.env << EOF
@@ -104,15 +116,15 @@ WG_HOST=$DOMAIN
 PASSWORD_HASH=$PASSWORD_HASH_ESCAPED
 
 # AmneziaWG Obfuscation (bypass Russia DPI/TSPU)
-AMNEZIA_JC=5
-AMNEZIA_JMIN=50
-AMNEZIA_JMAX=1000
-AMNEZIA_S1=75
-AMNEZIA_S2=75
-AMNEZIA_H1=$AMNEZIA_H1
-AMNEZIA_H2=$AMNEZIA_H2
-AMNEZIA_H3=$AMNEZIA_H3
-AMNEZIA_H4=$AMNEZIA_H4
+AWG_JC=5
+AWG_JMIN=50
+AWG_JMAX=1000
+AWG_S1=75
+AWG_S2=75
+AWG_H1=$AWG_H1
+AWG_H2=$AWG_H2
+AWG_H3=$AWG_H3
+AWG_H4=$AWG_H4
 
 # Optional: Cloudflare Turnstile (leave empty to disable CAPTCHA)
 TURNSTILE_SITE_KEY=

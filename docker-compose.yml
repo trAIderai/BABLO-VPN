@@ -16,17 +16,20 @@ services:
       - UI_CHART_TYPE=2
       - WG_MTU=1280
       # AmneziaWG obfuscation parameters (bypass Russia DPI/TSPU)
-      - AMNEZIA_JC=${AMNEZIA_JC:-5}
-      - AMNEZIA_JMIN=${AMNEZIA_JMIN:-50}
-      - AMNEZIA_JMAX=${AMNEZIA_JMAX:-1000}
-      - AMNEZIA_S1=${AMNEZIA_S1:-75}
-      - AMNEZIA_S2=${AMNEZIA_S2:-75}
-      - AMNEZIA_H1=${AMNEZIA_H1}
-      - AMNEZIA_H2=${AMNEZIA_H2}
-      - AMNEZIA_H3=${AMNEZIA_H3}
-      - AMNEZIA_H4=${AMNEZIA_H4}
+      - JC=${AWG_JC:-5}
+      - JMIN=${AWG_JMIN:-50}
+      - JMAX=${AWG_JMAX:-1000}
+      - S1=${AWG_S1:-75}
+      - S2=${AWG_S2:-75}
+      - H1=${AWG_H1}
+      - H2=${AWG_H2}
+      - H3=${AWG_H3}
+      - H4=${AWG_H4}
     volumes:
       - wg-easy-data:/etc/wireguard
+      - /usr/bin/awg:/usr/bin/wg:ro
+      - /usr/bin/awg-quick:/usr/bin/wg-quick:ro
+      - /lib/modules:/lib/modules:ro
     ports:
       - "51820:51820/udp"
       - "8053:8080"   # AdGuard Home admin panel
