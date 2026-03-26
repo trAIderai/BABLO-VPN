@@ -108,8 +108,8 @@ fi
 echo "=========================================="
 echo "   Stopping old containers..."
 echo "=========================================="
-docker stop wg-easy caddy vpn-ui xray-ui 2>/dev/null || true
-docker rm wg-easy caddy vpn-ui xray-ui 2>/dev/null || true
+docker stop wg-easy caddy vpn-ui xray-ui adguard-home hysteria2 2>/dev/null || true
+docker rm wg-easy caddy vpn-ui xray-ui adguard-home hysteria2 2>/dev/null || true
 
 # Build and start containers
 echo "=========================================="
@@ -133,6 +133,11 @@ echo "=========== WireGuard VPN =============="
 echo "Admin panel: https://$DOMAIN"
 echo "WireGuard port: 51820/udp"
 echo ""
+echo "============ AdGuard Home =============="
+echo "DNS: Active (port 53 via WireGuard)"
+echo "Admin: http://$SERVER_IP:8053"
+echo "Login: admin / admin (change in panel!)"
+echo ""
 echo "============= 3x-ui (Xray) ============="
 echo "Panel: http://$SERVER_IP:2053"
 echo "Login: admin"
@@ -141,7 +146,7 @@ echo "IMPORTANT: Change password immediately!"
 echo ""
 echo "Protocols:"
 echo "  VLESS/Trojan: port 8443/tcp"
-echo "  Hysteria2: port 8443/udp"
+echo "  Hysteria2: port 8445/udp"
 echo ""
 echo "=========== NEXT STEPS ================="
 echo "1. Open 3x-ui panel: http://$SERVER_IP:2053"

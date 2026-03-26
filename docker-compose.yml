@@ -19,7 +19,6 @@ services:
       - wg-easy-data:/etc/wireguard
     ports:
       - "51820:51820/udp"
-      - "3053:3000"   # AdGuard Home setup wizard (first run)
       - "8053:8080"   # AdGuard Home admin panel
     cap_add:
       - NET_ADMIN
@@ -36,7 +35,7 @@ services:
     network_mode: "service:wg-easy"
     volumes:
       - adguard-work:/opt/adguardhome/work
-      - adguard-conf:/opt/adguardhome/conf
+      - ./adguard:/opt/adguardhome/conf
     restart: unless-stopped
     depends_on:
       - wg-easy
@@ -128,4 +127,3 @@ volumes:
   xray-ui-data:
   xray-ui-certs:
   adguard-work:
-  adguard-conf:

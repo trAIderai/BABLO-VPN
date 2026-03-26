@@ -1,0 +1,63 @@
+http:
+  pprof:
+    port: 6060
+    enabled: false
+  address: 0.0.0.0:8080
+  session_ttl: 720h
+users:
+  - name: admin
+    password: ***REDACTED-HASH***
+dns:
+  bind_hosts:
+    - 0.0.0.0
+  port: 53
+  anonymize_client_ip: false
+  ratelimit: 0
+  ratelimit_subnet_len_ipv4: 24
+  ratelimit_subnet_len_ipv6: 56
+  upstream_dns:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+    - 8.8.8.8
+    - 1.1.1.1
+  bootstrap_dns:
+    - 8.8.8.8
+    - 1.1.1.1
+  protection_enabled: true
+  filtering_enabled: true
+  blocking_mode: default
+  blocked_response_ttl: 10
+  cache_size: 4194304
+  cache_ttl_min: 0
+  cache_ttl_max: 0
+  cache_optimistic: false
+  allowed_clients: []
+  disallowed_clients: []
+  blocked_hosts:
+    - version.bind
+    - id.server
+    - hostname.bind
+  safe_browsing:
+    enabled: false
+  parental:
+    enabled: false
+  safesearch:
+    enabled: false
+filters:
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
+    name: AdGuard DNS filter
+    id: 1
+  - enabled: true
+    url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt
+    name: AdAway Default Blocklist
+    id: 2
+querylog:
+  enabled: true
+  file_enabled: true
+  interval: 24h
+  size_memory: 1000
+statistics:
+  enabled: true
+  interval: 24h
+schema_version: 29
