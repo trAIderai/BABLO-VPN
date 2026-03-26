@@ -192,7 +192,7 @@ export async function GET(
     return new NextResponse(JSON.stringify(config, null, 2), {
       headers: {
         'Content-Type': 'application/json',
-        'Content-Disposition': `attachment; filename="${clientId}-singbox.json"`,
+        'Content-Disposition': `attachment; filename="${clientId.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9_=+.\-]/g, '')}-singbox.json"`,
       },
     });
   } catch (error) {

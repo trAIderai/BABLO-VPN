@@ -572,6 +572,9 @@ export default function HomePage() {
     }
   };
 
+  const sanitizeFilename = (name: string) =>
+    name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9_=+.\-]/g, '');
+
   const downloadConfig = async (client: Client) => {
     try {
       const res = await fetch("/api/wireguard/client/" + client.id + "/configuration");
@@ -580,7 +583,7 @@ export default function HomePage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = client.name + ".conf";
+      a.download = sanitizeFilename(client.name) + ".conf";
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -619,7 +622,7 @@ export default function HomePage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = client.name + "-singbox.json";
+      a.download = sanitizeFilename(client.name) + "-singbox.json";
       a.click();
       URL.revokeObjectURL(url);
     } catch (e) {
@@ -895,7 +898,7 @@ export default function HomePage() {
               </button>
             </div>
             <form onSubmit={addClient}>
-              <input type="text" className="input" placeholder="Имя (например iPhone, MacBook)" value={newClientName} onChange={(e) => setNewClientName(e.target.value)} autoFocus />
+              <input type="text" className="input" placeholder="Имя (например iPhone, MacBook)" value={newClientName} onChange={(e) => setNewClientName(e.target.value.replace(/\s+/g, '-'))} autoFocus />
 
               <div style={{ marginTop: "20px" }}>
                 <p style={{ fontSize: "14px", color: "#9CA3AF", marginBottom: "12px" }}>Тип защиты:</p>
