@@ -29,7 +29,9 @@ services:
       - wg-easy-data:/etc/wireguard
       - wg-easy-data:/etc/amnezia/amneziawg
       - /usr/bin/awg:/usr/bin/wg:ro
+      - /usr/bin/awg:/usr/bin/awg:ro
       - /usr/bin/awg-quick:/usr/bin/wg-quick:ro
+      - /usr/bin/awg-quick:/usr/bin/awg-quick:ro
       - /lib/modules:/lib/modules:ro
     ports:
       - "51820:51820/udp"
