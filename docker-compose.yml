@@ -5,8 +5,7 @@ services:
     environment:
       - LANG=ru
       - WG_HOST=${WG_HOST}
-      # Bcrypt hash - каждый $ экранирован как $$
-      - PASSWORD_HASH=${PASSWORD_HASH}
+      - PASSWORD=${PASSWORD}
       - WG_PORT=51820
       - WG_DEFAULT_DNS=10.8.0.1
       - WG_ALLOWED_IPS=0.0.0.0/0, ::/0
