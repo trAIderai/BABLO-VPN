@@ -1,0 +1,31 @@
+# Вариант с фирменным интерфейсом BABLO поверх панели.
+# Откат на простую панель wg-easy: подменить этот файл на Caddyfile.msk
+# и перезапустить caddy — правки на стороне wg-easy не требуются.
+{$WG_HOST} {
+    header {
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    # Собственные маршруты витрины
+    handle /api/auth {
+        reverse_proxy vpn-ui:3000
+    }
+    handle /api/config {
+        reverse_proxy vpn-ui:3000
+    }
+    handle /api/multi-config {
+        reverse_proxy vpn-ui:3000
+    }
+
+    # Остальное под /api/ — это API самой панели wg-easy
+    handle /api/* {
+        reverse_proxy wg-easy:51821
+    }
+
+    handle {
+        reverse_proxy vpn-ui:3000
+    }
+}

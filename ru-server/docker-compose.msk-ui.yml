@@ -1,0 +1,97 @@
+# Московский узел: только панель управления и обратный прокси.
+#
+# Сознательно БЕЗ 3x-ui, Hysteria2 и AdGuard. Они здесь не нужны (клиенты ходят
+# по AmneziaWG и резолвят через 77.88.8.8), а ненастроенная админка AdGuard на
+# порту 8053 смотрела бы мастером первичной настройки прямо в интернет.
+#
+# Параметры обфускации и порт ОБЯЗАНЫ совпадать с уже выданными клиентскими
+# конфигами — иначе хендшейка не будет. Значения берутся из .env, который
+# заполняется из /opt/bablo-exit/obfuscation.env.
+services:
+  wg-easy:
+    image: ghcr.io/spcfox/amnezia-wg-easy
+    container_name: wg-easy
+    environment:
+      - LANG=ru
+      - WG_HOST=${WG_HOST}
+      # Форк принимает ТОЛЬКО cleartext PASSWORD; PASSWORD_HASH он игнорирует,
+      # и админка окажется открытой без пароля.
+      - PASSWORD=${PASSWORD}
+      - WG_PORT=48920
+      - WG_DEFAULT_DNS=77.88.8.8
+      - WG_ALLOWED_IPS=0.0.0.0/0, ::/0
+      - WG_DEFAULT_ADDRESS=10.9.0.x
+      - PORT=51821
+      - UI_TRAFFIC_STATS=true
+      - UI_CHART_TYPE=2
+      - WG_MTU=1280
+      - JC=${AWG_JC}
+      - JMIN=${AWG_JMIN}
+      - JMAX=${AWG_JMAX}
+      - S1=${AWG_S1}
+      - S2=${AWG_S2}
+      - H1=${AWG_H1}
+      - H2=${AWG_H2}
+      - H3=${AWG_H3}
+      - H4=${AWG_H4}
+    volumes:
+      - wg-easy-data:/etc/wireguard
+      - wg-easy-data:/etc/amnezia/amneziawg
+      # Образ — Alpine 3.15 (musl) и несёт обычный wg, а не awg. Монтируем
+      # musl-сборку. Кладём её отдельным путём, а не поверх /usr/bin хоста:
+      # хостовые glibc-бинари остаются рабочими, и откат на голый awg-quick@awg0
+      # выполняется одной командой.
+      - ./bin/awg:/usr/bin/wg:ro
+      - ./bin/awg:/usr/bin/awg:ro
+      - ./bin/awg-quick:/usr/bin/wg-quick:ro
+      - ./bin/awg-quick:/usr/bin/awg-quick:ro
+      - /lib/modules:/lib/modules:ro
+    ports:
+      - "48920:48920/udp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+    restart: unless-stopped
+
+  # Фирменная витрина BABLO. Собирается ИЗ ИСХОДНИКОВ на самом сервере —
+  # 961 МБ RAM для `next build` мало, поэтому под неё расширен swap до 2 ГБ.
+  # Зависимостей от xray-ui и adguard-home здесь НЕТ: на московском узле этих
+  # сервисов нет, соответствующие переменные остаются пустыми.
+  vpn-ui:
+    build: ./frontend
+    container_name: vpn-ui
+    environment:
+      - NODE_ENV=production
+      - WG_HOST=${WG_HOST}
+      - TURNSTILE_SITE_KEY=
+      - TURNSTILE_SECRET_KEY=
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    depends_on:
+      - wg-easy
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    environment:
+      - WG_HOST=${WG_HOST}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+    depends_on:
+      - wg-easy
+      - vpn-ui
+
+volumes:
+  wg-easy-data:
+  caddy-data:
+  caddy-config:
