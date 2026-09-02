@@ -69,6 +69,68 @@ RU-сайты должны резолвиться в российские узл
 **Нестандартный порт `48920`.** `51820` слишком узнаваем; обфускация AmneziaWG
 делает основную работу, но лишний слой бесплатен.
 
+
+## Панель управления (этап 2)
+
+Узел изначально поднят headless. Панель добавлена поверх, **без перевыпуска
+профилей**: `migrate-to-panel.py` собирает `wg0.json` из уже существующих
+ключей, поэтому wg-easy подхватывает прежний ключ сервера и всех клиентов.
+Без этого шага панель при первом запуске сгенерировала бы новый ключ и все
+розданные QR умерли бы.
+
+```bash
+scp ru-server/docker-compose.msk.yml root@<MSK_IP>:/opt/bablo-vpn/docker-compose.yml
+scp ru-server/Caddyfile.msk          root@<MSK_IP>:/opt/bablo-vpn/Caddyfile
+scp ru-server/migrate-to-panel.py    root@<MSK_IP>:/root/
+
+# .env: WG_HOST, PASSWORD и AWG_* — последние копируются из
+# /opt/bablo-exit/obfuscation.env и ОБЯЗАНЫ совпасть с выданными конфигами
+
+python3 /root/migrate-to-panel.py                      # -> /tmp/wg0.json
+systemctl disable --now awg-quick@awg0                 # голый узел уступает место
+docker volume create bablo-vpn_wg-easy-data
+docker run --rm -v bablo-vpn_wg-easy-data:/data -v /tmp/wg0.json:/src.json:ro     alpine sh -c 'cp /src.json /data/wg0.json && chmod 600 /data/wg0.json'
+docker compose up -d wg-easy                           # caddy ТОЛЬКО после задания PASSWORD
+```
+
+### ★★★ musl-`awg`: собирать, а не копировать с другого сервера
+
+Образ wg-easy — Alpine 3.15 и несёт обычный `wg`, поэтому `awg` монтируется
+снаружи. Соблазн скопировать готовый бинарь с пражского сервера **не работает**:
+там `amneziawg-tools` стоит на `apt-mark hold`, версия старая, а модуль ядра
+здесь свежий. Симптом — контейнер в цикле перезапуска и в логах:
+
+```
+[#] awg setconf wg0 /dev/fd/63
+Unable to modify interface: Invalid argument
+```
+
+Собирать из исходников, **статически**, чтобы не зависеть ещё и от версии musl
+в контейнере, и класть в `/opt/bablo-vpn/bin/` — а не поверх `/usr/bin` хоста,
+как делает корневой `install.sh`. Тогда хостовые glibc-бинари остаются рабочими
+и откат на `awg-quick@awg0` выполняется одной командой.
+
+```bash
+docker run --rm -v /root/awg-build:/out alpine:3.15 sh -c '
+  apk add --no-cache git make gcc musl-dev linux-headers libmnl-dev libmnl-static bash &&
+  cd /tmp && git clone --depth 1 https://github.com/amnezia-vpn/amneziawg-tools.git &&
+  cd amneziawg-tools/src && make LDFLAGS="-static" && make install &&
+  cp /usr/bin/awg /usr/bin/awg-quick /out/'
+```
+
+Сверить версию собранного с хостовой: `awg --version` должны совпасть.
+
+### Проверка после переключения
+
+```bash
+docker exec wg-easy awg show wg0 public-key   # обязан совпасть с /opt/bablo-exit/server.pub
+curl -s https://<домен>/api/session            # {"requiresPassword":true,...}
+```
+
+Второй запрос критичен: форк принимает только cleartext `PASSWORD`,
+`PASSWORD_HASH` он игнорирует — при пустом пароле панель открыта всем.
+Поэтому `caddy` поднимается ТОЛЬКО после того, как пароль задан.
+
 ## Открытые вопросы (проверяются после развёртывания)
 
 1. Переживает ли туннель засыпание iPhone — от этого зависят **входящие** звонки.
