@@ -166,6 +166,13 @@ fi
 
 # Stop old containers
 echo "=========================================="
+# Конфиг AdGuard не хранится в git: в нём bcrypt-хэш админского пароля,
+# а репозиторий публичный. Первый запуск берёт шаблон.
+if [ ! -f adguard/AdGuardHome.yaml ]; then
+    echo "   Creating adguard/AdGuardHome.yaml from example..."
+    cp adguard/AdGuardHome.yaml.example adguard/AdGuardHome.yaml
+fi
+
 echo "   Stopping old containers..."
 echo "=========================================="
 docker stop wg-easy caddy vpn-ui xray-ui adguard-home hysteria2 2>/dev/null || true

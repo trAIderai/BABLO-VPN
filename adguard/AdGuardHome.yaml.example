@@ -6,7 +6,7 @@ http:
   session_ttl: 720h
 users:
   - name: admin
-    password: ***REDACTED-HASH***
+    password: "<bcrypt-хэш: см. README, раздел AdGuard>"
 dns:
   bind_hosts:
     - 0.0.0.0

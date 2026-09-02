@@ -54,6 +54,24 @@ sudo bash install.sh
 
 > ⚠️ Форк `ghcr.io/spcfox/amnezia-wg-easy` принимает **только cleartext `PASSWORD`**. `PASSWORD_HASH` он игнорирует — админка окажется открыта без пароля.
 
+### AdGuard Home: пароль админки
+
+`adguard/AdGuardHome.yaml` в git **не хранится** — в нём bcrypt-хэш админского пароля,
+а репозиторий публичный. `install.sh` создаёт файл из `adguard/AdGuardHome.yaml.example`
+при первом запуске. Задать или сменить пароль:
+
+```bash
+docker stop adguard-home     # обязательно: AdGuard перезаписывает свой yaml при выходе
+python3 -c "import bcrypt,getpass; print(bcrypt.hashpw(getpass.getpass('Новый пароль: ').encode(), bcrypt.gensalt(rounds=12)).decode())"
+# полученный хэш вставить в adguard/AdGuardHome.yaml -> users[0].password
+# тот же пароль в открытом виде -> ADGUARD_PASS в .env (его читает vpn-ui)
+docker start adguard-home
+docker compose up -d --force-recreate --no-deps vpn-ui
+```
+
+> ⚠ Админка AdGuard слушает `0.0.0.0:8053`, то есть доступна из интернета.
+> Пароль должен быть стойким.
+
 После правки `.env`: `cd /opt/bablo-vpn && docker compose up -d --force-recreate --no-deps wg-easy`.
 
 ## Access

@@ -31,3 +31,6 @@ claude.exe
 
 # Реквизиты SIP-провайдера (репозиторий публичный)
 ru-server/pbx.env
+
+# Конфиг AdGuard: содержит bcrypt-хэш админского пароля
+adguard/AdGuardHome.yaml

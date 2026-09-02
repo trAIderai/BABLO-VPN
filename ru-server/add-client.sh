@@ -27,8 +27,10 @@ OUT="$CLIENT_DIR/$SAFE_NAME.conf"
 [[ -e "$OUT" ]] && { echo "клиент '$SAFE_NAME' уже есть: $OUT" >&2; exit 1; }
 
 # следующий свободный адрес: .1 занят сервером
+# `|| true` обязателен: при пустой папке клиентов grep возвращает 2, и связка
+# set -e + pipefail уронила бы скрипт на первом же клиенте.
 USED=$(grep -hoE "${WG_SUBNET//./\.}\.[0-9]+" "$CONF_DIR/$WG_IF.conf" "$CLIENT_DIR"/*.conf 2>/dev/null \
-       | awk -F. '{print $4}' | sort -n | uniq)
+       | awk -F. '{print $4}' | sort -n | uniq || true)
 OCTET=2
 while echo "$USED" | grep -qx "$OCTET"; do OCTET=$((OCTET + 1)); done
 [[ $OCTET -le 254 ]] || { echo "адреса в подсети кончились" >&2; exit 1; }

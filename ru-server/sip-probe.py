@@ -24,6 +24,7 @@ import string
 import sys
 
 TIMEOUT = 5.0
+EXPIRES = 300   # ниже Min-Expires многих Kamailio-конфигов ответ будет 423, а не 401
 ENV_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pbx.env")
 
 
@@ -75,7 +76,7 @@ def main() -> int:
         "CSeq: 1 REGISTER",
         f"Contact: <sip:{user}@{local_ip}:{local_port}>",
         "Max-Forwards: 70",
-        "Expires: 60",
+        f"Expires: {EXPIRES}",
         "User-Agent: sip-probe/1.0",
         "Content-Length: 0",
         "", "",
@@ -96,6 +97,11 @@ def main() -> int:
 
     if " 401 " in first or " 407 " in first:
         print("РЕЗУЛЬТАТ: IP ПРОШЁЛ белый список — PBX просит авторизацию. Разворачиваем узел.")
+        return 0
+    if " 423 " in first:
+        # До проверки Expires запрос доходит только с разрешённого адреса:
+        # отказ по белому списку отдаётся раньше, чем валидация параметров.
+        print("РЕЗУЛЬТАТ: IP ПРОШЁЛ белый список — PBX дошёл до валидации Expires.")
         return 0
     if " 403 " in first:
         print("РЕЗУЛЬТАТ: IP ОТБИТ белым списком. Этот адрес не годится — нужен другой класс IP.")
