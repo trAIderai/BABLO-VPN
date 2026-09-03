@@ -313,6 +313,7 @@ export default function HomePage() {
   // Turnstile state
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string | null>(null);
   const [nodeLabel, setNodeLabel] = useState<string | null>(null);
+  const [nodeIndex, setNodeIndex] = useState(0);
   const [peerUrl, setPeerUrl] = useState<string | null>(null);
   const [peerLabel, setPeerLabel] = useState<string | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
@@ -331,6 +332,7 @@ export default function HomePage() {
         const res = await fetch("/api/config");
         const config = await res.json();
         if (config.nodeLabel) setNodeLabel(config.nodeLabel);
+        if (typeof config.nodeIndex === "number") setNodeIndex(config.nodeIndex);
         if (config.peerUrl) setPeerUrl(config.peerUrl);
         if (config.peerLabel) setPeerLabel(config.peerLabel);
         if (config.turnstileSiteKey) {
@@ -738,49 +740,42 @@ export default function HomePage() {
               <h1 className="font-bablo" style={{ fontSize: "22px", fontWeight: 600, margin: 0, color: "#F0B90B", letterSpacing: "0.05em" }}>BABLO VPN</h1>
               <p style={{ color: "#6B7280", fontSize: "14px", margin: 0 }}>AmneziaWG Clients</p>
             </div>
-            {nodeLabel && (
-              <span
-                className="node-label"
-                title="Какой сервер обслуживает эту панель"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  padding: "6px 14px",
-                  borderRadius: "999px",
-                  background: "rgba(255, 255, 255, 0.06)",
-                  border: "1px solid rgba(255, 255, 255, 0.14)",
-                  color: "#E5E7EB",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  letterSpacing: "0.06em",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {nodeLabel}
-              </span>
+            {nodeLabel && peerLabel && peerUrl && (
+              <div className="node-switch">
+                {(
+                  nodeIndex === 1
+                    ? [
+                        { label: peerLabel, href: peerUrl },
+                        { label: nodeLabel, href: null },
+                      ]
+                    : [
+                        { label: nodeLabel, href: null },
+                        { label: peerLabel, href: peerUrl },
+                      ]
+                ).map((seg) =>
+                  seg.href ? (
+                    <a
+                      key={seg.label}
+                      href={seg.href}
+                      className="node-switch-item"
+                      title={`Перейти на панель: ${seg.label}`}
+                    >
+                      {seg.label}
+                    </a>
+                  ) : (
+                    <span
+                      key={seg.label}
+                      className="node-switch-item is-active"
+                      title="Текущий сервер"
+                    >
+                      {seg.label}
+                    </span>
+                  )
+                )}
+              </div>
             )}
           </div>
           <div className="header-actions" style={{ display: "flex", gap: "8px" }}>
-            {peerUrl && (
-              <a
-                href={peerUrl}
-                className="btn-secondary header-btn"
-                title={`Открыть другую панель: ${peerLabel || peerUrl}`}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  textDecoration: "none",
-                  color: "#E5E7EB",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {peerLabel || "Другая панель"}
-                <ExternalLink className="header-icon" />
-              </a>
-            )}
             {clients.length > 0 && (
               <button
                 onClick={toggleAllClients}

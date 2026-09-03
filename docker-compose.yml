@@ -67,6 +67,7 @@ services:
       # Метка узла в шапке и кнопка перехода на соседнюю панель.
       # Не заданы — вид как был.
       - NODE_LABEL=${NODE_LABEL:-}
+      - NODE_INDEX=${NODE_INDEX:-0}
       - PEER_URL=${PEER_URL:-}
       - PEER_LABEL=${PEER_LABEL:-}
       - VLESS_PORT=${VLESS_PORT:-8443}

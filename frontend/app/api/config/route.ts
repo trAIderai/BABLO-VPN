@@ -9,6 +9,8 @@ export async function GET() {
     // Метка узла в шапке. Не задана — плашки нет (так у пражской панели).
     nodeLabel: process.env.NODE_LABEL || null,
     // Соседняя панель: кнопка перехода. Не задана — кнопки нет.
+    // Позиция этого узла в переключателе: 0 — слева, 1 — справа.
+    nodeIndex: Number(process.env.NODE_INDEX || 0),
     peerUrl: process.env.PEER_URL || null,
     peerLabel: process.env.PEER_LABEL || null,
   });
