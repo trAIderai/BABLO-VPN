@@ -279,12 +279,27 @@ body {
     row-gap: 6px;
   }
 
-  /* Плашка узла и кнопка перехода на соседнюю панель.
-     Без переноса они делают строку шире экрана, и тогда уезжает
-     вбок ВСЯ страница, а не только шапка. */
+  /* Логотип, название и переключатель — в одну строку: переключатель
+     прижат к правому краю. Строка обязана влезать в экран, иначе она
+     распирает центрированный контейнер и его срезает С ДВУХ сторон.
+     Поэтому здесь же уменьшены название и сам переключатель. */
   .header-left {
-    flex-wrap: wrap;
-    row-gap: 10px;
+    flex-wrap: nowrap;
+    gap: 10px !important;
+  }
+
+  .node-switch {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding: 2px;
+  }
+
+  .header-left h1 {
+    font-size: 18px !important;
+  }
+
+  .header-left p {
+    font-size: 12px !important;
   }
 
   /* Ни один элемент шапки не должен быть шире экрана. min-width:0 обязателен:
@@ -302,8 +317,12 @@ body {
   }
 
   .node-switch-item {
-    font-size: 12px;
-    padding: 5px 10px;
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  .header-left h1 {
+    font-size: 16px !important;
   }
 
   /* Stats grid - 3 columns but compact on mobile */
@@ -343,7 +362,7 @@ body {
   }
 
   .header-left {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .header-actions {
