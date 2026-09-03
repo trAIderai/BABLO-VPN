@@ -138,6 +138,28 @@ docker compose up -d --force-recreate --no-deps adguard-home vpn-ui
 
 ---
 
+## Безопасность репозитория
+
+Репозиторий **публичный**. Боевые значения в него не попадают: под `.gitignore`
+лежат `.env`, `adguard/AdGuardHome.yaml` и `ru-server/pbx.env`, а в репозитории
+остаются только образцы с заглушками (`*.example`).
+
+После клонирования включить хук, отклоняющий коммит с похожим на секрет:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Проверяются только **добавляемые** строки: bcrypt-хэши, приватные ключи,
+ключи и PSK WireGuard, UUID, `PASSWORD=` с настоящим значением, пароль
+открытым текстом, ключ Turnstile. Осознанно обойти — `git commit --no-verify`.
+
+> История переписана 2026-09-03 (`git filter-repo`): вычищены пароль админки,
+> bcrypt-хэш AdGuard, два UUID VLESS и `.claude/settings.local.json`. Все эти
+> значения к тому моменту уже были ротированы или не действовали. Хэши коммитов
+> после переписывания изменились — старые клоны нужно переклонировать, а не
+> сливать.
+
 ## Credits
 
 This project is built on top of the amazing **[wg-easy](https://github.com/wg-easy/wg-easy)** project.
