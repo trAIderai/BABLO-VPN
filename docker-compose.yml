@@ -64,6 +64,11 @@ services:
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
       # VLESS Reality settings (extracted from 3x-ui after setup)
       - WG_HOST=${WG_HOST}
+      # Метка узла в шапке и кнопка перехода на соседнюю панель.
+      # Не заданы — вид как был.
+      - NODE_LABEL=${NODE_LABEL:-}
+      - PEER_URL=${PEER_URL:-}
+      - PEER_LABEL=${PEER_LABEL:-}
       - VLESS_PORT=${VLESS_PORT:-8443}
       - VLESS_UUID=${VLESS_UUID}
       - REALITY_PUBLIC_KEY=${REALITY_PUBLIC_KEY}
