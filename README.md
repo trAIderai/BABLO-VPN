@@ -1,5 +1,9 @@
 # BABLO VPN
 
+> **С чего начинать:** [`OPERATIONS.md`](OPERATIONS.md) — состояние обоих узлов, доступы,
+> типовые задачи, известные грабли и открытые вопросы. Этот файл описывает стек,
+> `OPERATIONS.md` — как с ним жить.
+
 Multi-protocol VPN management with custom UI in trAIder style.
 
 ## Supported Protocols
