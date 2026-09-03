@@ -122,7 +122,9 @@ services:
       - xray-ui-data:/etc/x-ui
       - xray-ui-certs:/root/cert
     ports:
-      - "2053:2053"     # Admin panel
+      # Админка 3x-ui только с localhost: снаружи она была открыта по HTTP.
+      # Доступ: ssh -L 2053:127.0.0.1:2053 root@<сервер>, затем http://127.0.0.1:2053
+      - "127.0.0.1:2053:2053"   # Admin panel
       - "8443:8443"     # VLESS Reality
       - "8444:8444"     # Trojan Reality
     restart: unless-stopped
