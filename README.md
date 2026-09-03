@@ -65,9 +65,17 @@ docker stop adguard-home     # обязательно: AdGuard перезапи�
 python3 -c "import bcrypt,getpass; print(bcrypt.hashpw(getpass.getpass('Новый пароль: ').encode(), bcrypt.gensalt(rounds=12)).decode())"
 # полученный хэш вставить в adguard/AdGuardHome.yaml -> users[0].password
 # тот же пароль в открытом виде -> ADGUARD_PASS в .env (его читает vpn-ui)
-docker start adguard-home
-docker compose up -d --force-recreate --no-deps vpn-ui
+# ВАЖНО: именно up --force-recreate, а НЕ docker start.
+# adguard-home живёт в сетевом пространстве wg-easy (network_mode: service:wg-easy)
+# и хранит ID того контейнера. После остановки docker перепроверяет ссылку, она
+# оказывается устаревшей, и docker start падает с
+#   joining network namespace of container: No such container: <id>
+# Пересоздание привязывает его к текущему wg-easy заново.
+docker compose up -d --force-recreate --no-deps adguard-home vpn-ui
 ```
+
+> ⚠ Пока adguard-home остановлен, у клиентов пражского VPN не резолвится DNS
+> (`WG_DEFAULT_DNS=10.8.0.1` смотрит именно на него). Правку делать быстро.
 
 > ⚠ Админка AdGuard слушает `0.0.0.0:8053`, то есть доступна из интернета.
 > Пароль должен быть стойким.
